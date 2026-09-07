@@ -1,0 +1,10 @@
+const StaffRoutes = require("../../Controller/Staff/script");
+const express = require('express');
+const { authMiddleware, isAdmin } = require("../../Middleware/AuthMiddleware/script");
+const router = express.Router();
+router.post("/createStaff", authMiddleware, isAdmin, StaffRoutes.createStaff);
+router.get("/getStaff", authMiddleware, StaffRoutes.getStaff);
+router.get("/getSingleStaff/:id", authMiddleware, StaffRoutes.getSingleStaff);
+router.put("/updateStaff/:id", authMiddleware, isAdmin, StaffRoutes.updateStaff);
+router.delete("/deleteStaff/:id", authMiddleware, isAdmin, StaffRoutes.deleteStaff);
+module.exports = router;
