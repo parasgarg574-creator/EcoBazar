@@ -1,8 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { MdOutlineEmail } from "react-icons/md";
-import { GoPeople } from "react-icons/go";
-import { VscGraph } from "react-icons/vsc";
 import AuthLayout from "../../Layout/AuthLayout";
 const ForgotPassword = () => {
     const [login, setLogin] = useState({
@@ -19,8 +17,6 @@ const ForgotPassword = () => {
         console.log(login)
     };
     return (
-        <>
-        <div className="min-h-screen flex items-center justify-center p-4">
             <AuthLayout>
                 <h1 className="text-[25px] sm:text-[28px] font-medium text-[#00B207] text-center mb-6 sm:mb-7">
                     Forgot Password
@@ -44,11 +40,11 @@ const ForgotPassword = () => {
                 </form>
                 <p className="text-center text-[12px] sm:text-[13px] text-gray-600 mt-5">
                     Remember Your Password?{" "}
-                    <NavLink>Login</NavLink>
+                    <NavLink to="/login" className="font-medium text-[#00B207] hover:underline">
+                        Login
+                    </NavLink>
                 </p>
-        </AuthLayout >
-        </div>
-            </>
+        </AuthLayout>
         )
     }
 export default ForgotPassword

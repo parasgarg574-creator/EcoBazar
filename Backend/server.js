@@ -7,7 +7,9 @@ const AdminPublicRoutes = require("./Routes/Admin/Public/script");
 const AdminProtectedRoutes = require("./Routes/Admin/Protected/script");
 const CategoryRoutes = require("./Routes/category/script");
 const StaffRoutes = require("./Routes/Staff/script");
-const ProductRoutes = require("./Routes/Product/script")
+const ProductRoutes = require("./Routes/Product/script");
+const ContentRoutes = require("./Routes/Content/script");
+const FaqRoutes = require("./Routes/Faq/script");
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -17,10 +19,12 @@ app.use("/public", AdminPublicRoutes);
 app.use("/protected", AdminProtectedRoutes);
 app.use("/", CategoryRoutes);
 app.use("/", StaffRoutes);
-app.use("/",ProductRoutes)
+app.use("/",ProductRoutes);
+app.use("/",ContentRoutes);
+app.use("/",FaqRoutes);
 app.use(
     "/uploads",
-    express.static(path.join(__dirname, "uploads"))
+    express.static(path.join(__dirname, "Middleware", "uploads"))
 );
 app.get("/", (req, res) => {
     res.status(200).json({

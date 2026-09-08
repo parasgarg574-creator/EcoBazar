@@ -31,14 +31,19 @@ const Login = () => {
         password,
       }
     );
-    console.log("Login successful:", response);
-    localStorage.setItem("response", JSON.stringify(response));
+    // `response` is the raw Axios response object; the API's JSON body
+    // (the shape the rest of the app expects, e.g. `{ token, data: {...} }`)
+    // lives at `response.data`. Storing `response` itself would throw
+    // ("Converting circular structure to JSON") because Axios responses
+    // contain circular references.
+    const result = response?.data;
+    localStorage.setItem("response", JSON.stringify(result));
     localStorage.setItem(
       "userPermissions",
-      JSON.stringify(response?.data?.permissions || [])
+      JSON.stringify(result?.data?.permissions || [])
     );
-    if (response?.token) {
-      localStorage.setItem("token", response.token);
+    if (result?.token) {
+      localStorage.setItem("token", result.token);
     }
     await Swal.fire({
       title: "Login Successful",
@@ -56,7 +61,6 @@ const Login = () => {
   }
 };
   return (
-    <div className="min-h-screen  flex items-center justify-center p-4">
       <AuthLayout>
         <div className="mb-6 text-center">
           <img
@@ -173,8 +177,6 @@ const Login = () => {
           </button>
         </form>
       </AuthLayout>
-      </div>
-
   );
 };
 export default Login;

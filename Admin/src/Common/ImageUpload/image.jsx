@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 const ImageUpload = ({
   value = null,
@@ -11,7 +11,16 @@ const ImageUpload = ({
   error = "",
 }) => {
   const inputRef = useRef(null);
-  const [preview, setPreview] = useState(value);
+  const [preview, setPreview] = useState(value)
+  useEffect(() => {
+    setPreview((prev) => {
+      const hasLocalSelection = multiple
+        ? Array.isArray(prev) && prev.some((item) => item?.file)
+        : Boolean(prev && typeof prev === "object" && prev.file);
+
+      return hasLocalSelection ? prev : value;
+    });
+  }, [value]);
 
   const handleUpload = (e) => {
     const files = Array.from(e.target.files || []);
@@ -38,7 +47,6 @@ const ImageUpload = ({
       onChange?.(file);
     }
 
-    // Allow selecting the same image again
     e.target.value = "";
   };
 

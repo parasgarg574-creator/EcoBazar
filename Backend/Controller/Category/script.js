@@ -84,8 +84,9 @@ const updateCategory = async (req, res) => {
             });
         }
 
-        category.name = name;
-        category.description = description;
+        category.name = name || category.name;
+        category.description =
+            description !== undefined ? description : category.description;
 
         if (req.file) {
             category.image = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;

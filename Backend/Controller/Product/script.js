@@ -2,8 +2,12 @@ const mongoose = require("mongoose");
 const Product = require("../../Modles/Product/script");
 const createProduct = async (req, res) => {
   try {
-    const { categoryID, name, price, discount, stock, description, image } =
+    const { categoryID, name, price, discount, stock, description } =
       req.body;
+    let imageUrl = "";
+    if (req.file) {
+      imageUrl = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;
+    }
     const product = await Product.create({
       categoryID,
       name,
@@ -11,7 +15,7 @@ const createProduct = async (req, res) => {
       discount,
       stock,
       description,
-      image,
+      image: imageUrl,
     });
 
     res.status(201).json({
@@ -206,8 +210,14 @@ const updateProduct = async (req, res) => {
         message: "Invalid product ID",
       });
     }
-    const product = await Product.findByIdAndUpdate( id, req.body,
-    );
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.image = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;
+    }
+    const product = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
     if (!product) {
       return res.status(404).json({
         success: false,

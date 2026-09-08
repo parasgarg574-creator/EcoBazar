@@ -225,7 +225,7 @@ const Product = () => {
 
         try {
             await apimethods.deleteApi(
-                `deleteProduct/${productId}`
+                `/deleteProduct/${productId}`
             );
 
             setProducts((prevProducts) =>

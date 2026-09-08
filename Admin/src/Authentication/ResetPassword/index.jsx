@@ -26,7 +26,6 @@ const ResetPassword = () => {
         console.log(passwords);
     };
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
             <AuthLayout>
                 <div className="flex justify-center mb-3 sm:mb-4">
                     <img
@@ -126,7 +125,6 @@ const ResetPassword = () => {
                     </button>
                 </form>
             </AuthLayout>
-        </div>
     );
 };
 

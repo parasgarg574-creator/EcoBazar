@@ -37,6 +37,16 @@ const Category = () => {
     {
       key: "image",
       label: "Image",
+      render: (category) =>
+        category?.image ? (
+          <img
+            src={category.image}
+            alt={category.name || "Category"}
+            className="h-12 w-12 rounded object-cover"
+          />
+        ) : (
+          "-"
+        ),
     },
   ];
   const handleViewCategory = async (categoryId) => {

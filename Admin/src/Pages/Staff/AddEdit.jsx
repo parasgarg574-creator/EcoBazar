@@ -75,6 +75,30 @@ const permissionsList = [
         label: "Delete Categories", 
     },
     {
+        key: "readContent",
+        label: "View Content Management",
+    },
+    {
+        key: "updateContent",
+        label: "Edit Content Management",
+    },
+    {
+        key: "readFaqs",
+        label: "View FAQs",
+    },
+    {
+        key: "createFaqs",
+        label: "Create FAQs",
+    },
+    {
+        key: "updateFaqs",
+        label: "Edit FAQs",
+    },
+    {
+        key: "deleteFaqs",
+        label: "Delete FAQs",
+    },
+    {
         key: "readSettings",
         label: "View Settings",
     },
