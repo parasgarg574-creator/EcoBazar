@@ -8,22 +8,10 @@ const createProduct = async (req, res) => {
     if (req.file) {
       imageUrl = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;
     }
-    const product = await Product.create({
-      categoryID,
-      name,
-      price,
-      discount,
-      stock,
-      description,
-      image: imageUrl,
+    const product = await Product.create({ categoryID, name, price, discount, stock, description, image: imageUrl,});     
+    res.status(201).json({ success: true, message: "Product created successfully", data: product,
     });
-
-    res.status(201).json({
-      success: true,
-      message: "Product created successfully",
-      data: product,
-    });
-  } catch (error) {
+  } catch (error) {                 
     res.status(500).json({
       success: false,
       message: error.message,
@@ -84,8 +72,7 @@ const getAllProducts = async (req, res) => {
       },
       {
         $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true,
+          path: "$category",              
         },
       },
       {
@@ -160,7 +147,6 @@ const getProductById = async (req, res) => {
       {
         $unwind: {
           path: "$category",
-          preserveNullAndEmptyArrays: true,
         },
       },
 

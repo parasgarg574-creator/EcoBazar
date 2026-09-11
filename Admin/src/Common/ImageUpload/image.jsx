@@ -64,7 +64,7 @@ const ImageUpload = ({
 
   return (
     <div>
-      {/* Upload Button */}
+
       {(!preview || multiple) && (
         <label
           className={`block cursor-pointer text-gray-500 bg-white border border-dashed border-[#00358575]

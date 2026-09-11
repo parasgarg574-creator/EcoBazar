@@ -7,10 +7,17 @@ const initialFormData = {
   name: "",
   description: "",
   image: null,
+  ispopular: false,
 };
 
-const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
-  const [formData, setFormData] = useState(initialFormData);
+const AddEdit = ({
+  setShowForm,
+  setCategories,
+  editCategory = null,
+}) => {
+  const [formData, setFormData] =
+    useState(initialFormData);
+
   const [loading, setLoading] = useState(false);
 
   const isEditMode = Boolean(editCategory);
@@ -21,18 +28,31 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
         name: editCategory.name || "",
         description: editCategory.description || "",
         image: editCategory.image || null,
+
+        // Important
+        ispopular: editCategory.ispopular ?? false,
       });
     } else {
-      setFormData(initialFormData);
+      setFormData({
+        ...initialFormData,
+      });
     }
   }, [editCategory]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
   };
 
@@ -52,55 +72,104 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
       const data = new FormData();
 
       data.append("name", formData.name);
-      data.append("description", formData.description);
-      if (formData.image && typeof formData.image !== "string") {
-        data.append("image", formData.image);
+      data.append(
+        "description",
+        formData.description
+      );
+
+      // Send boolean as string because FormData
+      // sends values as strings
+      data.append(
+        "ispopular",
+        formData.ispopular ? "true" : "false"
+      );
+
+      if (
+        formData.image &&
+        typeof formData.image !== "string"
+      ) {
+        data.append(
+          "image",
+          formData.image
+        );
       }
 
       if (isEditMode) {
-        const categoryId = editCategory._id || editCategory.id;
+        const categoryId =
+          editCategory._id ||
+          editCategory.id;
+
         if (!categoryId) {
-          throw new Error("Category ID not found");
+          throw new Error(
+            "Category ID not found"
+          );
         }
-        const response = await apimethods.putImageApi(
-          `/updateCategory/${categoryId}`,
-          data
-        );
+
+        const response =
+          await apimethods.putImageApi(
+            `/updateCategory/${categoryId}`,
+            data
+          );
+
         const updatedCategory =
-          response?.data?.data || response?.data || response;
+          response?.data?.data ||
+          response?.data ||
+          response;
 
         setCategories((prev) =>
           prev.map((category) => {
-            const currentId = category._id || category.id;
+            const currentId =
+              category._id ||
+              category.id;
+
             return currentId === categoryId
-              ? { ...category, ...updatedCategory }
+              ? {
+                  ...category,
+                  ...updatedCategory,
+                }
               : category;
           })
         );
+
         await Swal.fire({
-          title: "Category Updated Successfully",
+          title:
+            "Category Updated Successfully",
           icon: "success",
         });
       } else {
-        const response = await apimethods.postImageApi(
-          "/addcategory",
-          data
-        );
+        const response =
+          await apimethods.postImageApi(
+            "/addcategory",
+            data
+          );
+
         const newCategory =
-          response?.data?.data || response?.data || response;
-        setCategories((prev) => [...prev, newCategory]);
+          response?.data?.data ||
+          response?.data ||
+          response;
+
+        setCategories((prev) => [
+          ...prev,
+          newCategory,
+        ]);
 
         await Swal.fire({
-          title: "Category Added Successfully",
+          title:
+            "Category Added Successfully",
           icon: "success",
         });
       }
 
-      setFormData(initialFormData);
+      setFormData({
+        ...initialFormData,
+      });
+
       setShowForm(false);
     } catch (error) {
       console.error(
-        isEditMode ? "Failed to update category:" : "Failed to add category:",
+        isEditMode
+          ? "Failed to update category:"
+          : "Failed to add category:",
         error
       );
 
@@ -108,10 +177,12 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
         title: isEditMode
           ? "Failed to Update Category"
           : "Failed to Add Category",
+
         text:
           error?.response?.data?.message ||
           error?.message ||
           "Something went wrong",
+
         icon: "error",
       });
     } finally {
@@ -127,18 +198,21 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
       >
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-green-700">
-            {isEditMode ? "Edit Category" : "Add Category"}
+            {isEditMode
+              ? "Edit Category"
+              : "Add Category"}
           </h2>
 
           <button
             type="button"
-            onClick={() => setShowForm(false)}
+            onClick={() =>
+              setShowForm(false)
+            }
             className="text-xl text-gray-500 hover:text-red-500"
           >
             ✕
           </button>
         </div>
-
         <div className="mb-4">
           <label
             htmlFor="name"
@@ -146,7 +220,6 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
           >
             Name
           </label>
-
           <input
             id="name"
             type="text"
@@ -176,12 +249,29 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
           />
         </div>
         <div className="mb-6">
+          <label className="flex cursor-pointer items-center gap-3">
+            <input
+              type="checkbox"
+              name="ispopular"
+              checked={formData.ispopular}
+              onChange={handleChange}
+              className="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            />
+
+            <span className="text-sm font-medium text-gray-700">
+              Mark as Popular Category
+            </span>
+          </label>
+        </div>
+        <div className="mb-6">
           <label className="mb-2 block text-sm font-medium text-gray-700">
             Image
           </label>
           <ImageUpload
             value={
-              typeof formData.image === "string" ? formData.image : null
+              typeof formData.image === "string"
+                ? formData.image
+                : null
             }
             onChange={handleImageChange}
             label="Upload Category Image"
@@ -195,10 +285,15 @@ const AddEdit = ({ setShowForm, setCategories, editCategory = null }) => {
           disabled={loading}
           className="w-full rounded-lg bg-green-600 py-2.5 font-semibold text-white shadow-sm transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Submitting..." : isEditMode ? "Update" : "Submit"}
+          {loading
+            ? "Submitting..."
+            : isEditMode
+            ? "Update"
+            : "Submit"}
         </button>
       </form>
     </div>
   );
 };
+
 export default AddEdit;

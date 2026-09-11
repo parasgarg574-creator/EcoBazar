@@ -12,6 +12,10 @@ const categorySchema = mongoose.Schema({
         default: "",
         required: true,
     },
+    ispopular:{
+        type: Boolean,
+        default: false
+    }
 },
 {
     timestamps: true

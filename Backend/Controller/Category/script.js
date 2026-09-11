@@ -1,7 +1,7 @@
 const Category = require("../../Modles/Category/script");
 const createCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description,ispopular } = req.body;
 
         if (!name) {
             return res.status(400).json({
@@ -16,6 +16,7 @@ const createCategory = async (req, res) => {
         const category = await Category.create({
             name,
             description,
+            ispopular,
             image: imageUrl
         });
 
@@ -73,7 +74,7 @@ const getSingleCategory = async (req, res) => {
 };
 const updateCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description , ispopular } = req.body;
 
         const category = await Category.findById(req.params.id);
 
@@ -87,6 +88,7 @@ const updateCategory = async (req, res) => {
         category.name = name || category.name;
         category.description =
             description !== undefined ? description : category.description;
+        category.ispopular = ispopular === true || ispopular==="true"
 
         if (req.file) {
             category.image = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;

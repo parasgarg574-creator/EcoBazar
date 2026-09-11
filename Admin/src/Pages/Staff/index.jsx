@@ -11,10 +11,6 @@ const Staff = () => {
     const [selectedStaff, setSelectedStaff] = useState(null);
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ role: "all" });
-
-    // Managing staff (create/update/delete) is restricted to admins only on
-    // the backend (see Routes/Staff/script.js), so mirror that here rather
-    // than trusting the permissions list for these two actions.
     const canEditStaff = permissions.isAdmin();
     const canDeleteStaff = permissions.isAdmin();
     const getStaffList = async () => {
