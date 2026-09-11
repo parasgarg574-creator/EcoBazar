@@ -35,6 +35,14 @@ const ProductSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+     ispopular:{
+        type: Boolean,
+        default: false
+    },
+    isfeatured:{
+        type: Boolean,
+        default: false
+    }
   },
   { timestamps: true }
 );

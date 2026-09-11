@@ -50,46 +50,83 @@ const Product = () => {
         getProducts();
         getCategories();
     }, []);
-    const columns = [
-        {
-            key: "name",
-            label: "Product",
-        },
-        {
-            key: "category",
-            label: "Category",
-            render: (product) => product?.category?.name || "-",
-        },
-        {
-            key: "price",
-            label: "Price",
-            render: (product) => `₹${product?.price ?? 0}`,
-        },
-        {
-            key: "discount",
-            label: "Discount",
-            render: (product) => `${product?.discount ?? 0}%`,
-        },
-        {
-            key: "stock",
-            label: "Stock",
-        },
-        {
-            key: "image",
-            label: "Image",
-            render: (product) =>
-                product?.image ? (
-                    <img
-                        src={product.image}
-                        alt={product.name || "Product"}
-                        className="h-12 w-12 rounded object-cover"
-                    />
-                ) : (
-                    "-"
-                ),
-        },
-    ];
-
+const columns = [
+    {
+        key: "name",
+        label: "Product",
+    },
+    {
+        key: "category",
+        label: "Category",
+        render: (product) => product?.category?.name || "-",
+    },
+    {
+        key: "price",
+        label: "Price",
+        render: (product) => `₹${product?.price ?? 0}`,
+    },
+    {
+        key: "discount",
+        label: "Discount",
+        render: (product) => `${product?.discount ?? 0}%`,
+    },
+    {
+        key: "stock",
+        label: "Stock",
+    },
+{
+    key: "ispopular",
+    label: "Popular",
+    render: (product) => (
+        <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                product?.ispopular === true ||
+                product?.ispopular === "true"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-500"
+            }`}
+        >
+            {product?.ispopular === true ||
+            product?.ispopular === "true"
+                ? "Yes"
+                : "No"}
+        </span>
+    ),
+},
+{
+    key: "isfeatured",
+    label: "Featured",
+    render: (product) => (
+        <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                product?.isfeatured === true ||
+                product?.isfeatured === "true"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-500"
+            }`}
+        >
+            {product?.isfeatured === true ||
+            product?.isfeatured === "true"
+                ? "Yes"
+                : "No"}
+        </span>
+    ),
+},
+    {
+        key: "image",
+        label: "Image",
+        render: (product) =>
+            product?.image ? (
+                <img
+                    src={product.image}
+                    alt={product.name || "Product"}
+                    className="h-12 w-12 rounded object-cover"
+                />
+            ) : (
+                "-"
+            ),
+    },
+];
     const handleViewProduct = async (productId) => {
         if (!productId) {
             console.error("Product ID is missing");

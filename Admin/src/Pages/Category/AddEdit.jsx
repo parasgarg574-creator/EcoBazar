@@ -8,6 +8,7 @@ const initialFormData = {
   description: "",
   image: null,
   ispopular: false,
+  isfeatured: false,
 };
 
 const AddEdit = ({
@@ -31,6 +32,7 @@ const AddEdit = ({
 
         // Important
         ispopular: editCategory.ispopular ?? false,
+        isfeatured: editCategory.isfeatured ?? false,
       });
     } else {
       setFormData({
@@ -76,9 +78,6 @@ const AddEdit = ({
         "description",
         formData.description
       );
-
-      // Send boolean as string because FormData
-      // sends values as strings
       data.append(
         "ispopular",
         formData.ispopular ? "true" : "false"

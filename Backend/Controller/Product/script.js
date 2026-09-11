@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 const Product = require("../../Modles/Product/script");
 const createProduct = async (req, res) => {
   try {
-    const { categoryID, name, price, discount, stock, description } =
+    const { categoryID, name, price, discount, stock, description, ispopular, isfeatured } =
       req.body;
     let imageUrl = "";
     if (req.file) {
       imageUrl = `${req.protocol}://${req.get("host")}/uploads/categories/${req.file.filename}`;
     }
-    const product = await Product.create({ categoryID, name, price, discount, stock, description, image: imageUrl,});     
+    const product = await Product.create({ categoryID, name, price, discount, stock, description, image: imageUrl, ispopular, isfeatured });     
     res.status(201).json({ success: true, message: "Product created successfully", data: product,
     });
   } catch (error) {                 
@@ -96,6 +96,9 @@ const getAllProducts = async (req, res) => {
           description: 1,
           image: 1,
           createdAt: 1,
+          isfeatured: 1,
+          ispopular: 1,
+          updatedAt: 1,
 
           category: {
             _id: "$category._id",
@@ -160,7 +163,8 @@ const getProductById = async (req, res) => {
           image: 1,
           createdAt: 1,
           updatedAt: 1,
-
+          ispopular:1,
+          isfeatured:1,
           category: {
             _id: "$category._id",
             name: "$category.name",

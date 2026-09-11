@@ -9,6 +9,8 @@ const initialFormData = {
   discount: "",
   stock: "",
   description: "",
+  ispopular: false,
+  isfeatured: false,
   image: null,
 };
 const AddEditProduct = ({
@@ -20,35 +22,43 @@ const AddEditProduct = ({
   const [formData, setFormData] = useState(initialFormData);
   const [loading, setLoading] = useState(false);
   const isEditMode = Boolean(editProduct);
-
   useEffect(() => {
     if (!editProduct) {
       setFormData(initialFormData);
       return;
     }
-    setFormData({
-      categoryID:
+
+   setFormData({
+    categoryID:
         editProduct.categoryID?._id ||
         editProduct.categoryID ||
         editProduct.category?._id ||
         "",
 
-      name: editProduct.name || "",
-      price: editProduct.price ?? "",
-      discount: editProduct.discount ?? "",
-      stock: editProduct.stock ?? "",
-      description: editProduct.description || "",
-      image: editProduct.image || null,
-    });
-  }, [editProduct]);
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+    name: editProduct.name || "",
+    price: editProduct.price ?? "",
+    discount: editProduct.discount ?? "",
+    stock: editProduct.stock ?? "",
+    description: editProduct.description || "",
 
+    ispopular:
+        editProduct.ispopular === true ||
+        editProduct.ispopular === "true",
+
+    isfeatured:
+        editProduct.isfeatured === true ||
+        editProduct.isfeatured === "true",
+
+    image: editProduct.image || null,
+});
+  }, [editProduct]);
+ const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
-      ...prev,
-      [name]: value,
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
     }));
-  };
+};
   const handleImageChange = (file) => {
     setFormData((prev) => ({
       ...prev,
@@ -66,6 +76,9 @@ const AddEditProduct = ({
       form.append("discount", formData.discount);
       form.append("stock", formData.stock);
       form.append("description", formData.description);
+      form.append("ispopular", String(formData.ispopular));
+      form.append("isfeatured", String(formData.isfeatured));
+
       if (
         formData.image &&
         typeof formData.image !== "string"
@@ -96,9 +109,9 @@ const AddEditProduct = ({
 
             return id === productId
               ? {
-                  ...product,
-                  ...updatedProduct,
-                }
+                ...product,
+                ...updatedProduct,
+              }
               : product;
           })
         );
@@ -307,6 +320,36 @@ const AddEditProduct = ({
           />
         </div>
         <div className="mb-6">
+          <label className="flex cursor-pointer items-center gap-3">
+            <input
+              type="checkbox"
+              name="ispopular"
+              checked={formData.ispopular}
+              onChange={handleChange}
+              className="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            />
+
+            <span className="text-sm font-medium text-gray-700">
+              Mark as Popular Category
+            </span>
+          </label>
+        </div>
+        <div className="mb-6">
+          <label className="flex cursor-pointer items-center gap-3">
+            <input
+              type="checkbox"
+              name="isfeatured"
+              checked={formData.isfeatured}
+              onChange={handleChange}
+              className="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            />
+
+            <span className="text-sm font-medium text-gray-700">
+              Mark as Featured Product
+            </span>
+          </label>
+        </div>
+        <div className="mb-6">
           <label className="mb-2 block text-sm font-medium text-gray-700">
             Product Image
           </label>
@@ -331,8 +374,8 @@ const AddEditProduct = ({
           {loading
             ? "Submitting..."
             : isEditMode
-            ? "Update Product"
-            : "Add Product"}
+              ? "Update Product"
+              : "Add Product"}
         </button>
       </form>
     </div>
