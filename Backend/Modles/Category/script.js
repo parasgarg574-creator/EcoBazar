@@ -15,6 +15,10 @@ const categorySchema = mongoose.Schema({
     ispopular:{
         type: Boolean,
         default: false
+    },
+    productID:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "product"
     }
 },
 {

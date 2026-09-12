@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const Home = () => {
     const [popularCategories, setPopularCategories] = useState([]);
     const [popularproducts, setPopularProducts] = useState([]);
     const [Featuredproducts , setFeatuedproducts] =  useState([])
+    const navigation = useNavigate();
     const getcategory = async () => {
         try {
             const response = await fetch("http://localhost:5000/getcategory", {
@@ -76,6 +77,7 @@ const Home = () => {
                     {popularCategories.map((item) => (
                         <div
                             key={item._id}
+                            onClick={() => { navigation(`/category/${item._id}`) }}
                             className="group flex h-[210px] cursor-pointer flex-col items-center justify-between overflow-hidden rounded-md border-2 border-gray-200 bg-white px-3 py-4 transition-all duration-200 hover:border-green-500 sm:h-[215px]"
                         >
                             <div className="flex h-[155px] w-full items-center justify-center">
@@ -96,7 +98,6 @@ const Home = () => {
                     <h2 className="text-2xl font-bold tracking-tight text-black sm:text-3xl">
                         Popular Products
                     </h2>
-
                     <button className="flex items-center gap-1 text-sm font-semibold text-green-500 transition hover:text-green-400 sm:text-base">
                         View All
                         <span className="text-xl leading-none">→</span>
@@ -157,7 +158,6 @@ const Home = () => {
                                     className="h-full w-full object-contain p-2"
                                 />
                             </div>
-
                             <div className="w-full">
                                 <h3 className="truncate text-center text-base font-medium text-gray-900 sm:text-lg">
                                     {item.name}
