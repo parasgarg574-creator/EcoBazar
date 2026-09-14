@@ -16,6 +16,7 @@ const initialFormData = {
 const AddEditProduct = ({
   setShowForm,
   setProducts,
+  refreshProducts,
   categories = [],
   editProduct = null,
 }) => {
@@ -103,18 +104,24 @@ const AddEditProduct = ({
         const updatedProduct =
           response?.data?.data || response?.data;
 
-        setProducts((prevProducts) =>
-          prevProducts.map((product) => {
-            const id = product._id || product.id;
+        if (typeof refreshProducts === "function") {
+          // Re-fetch the current page from the server so the list reflects
+          // what's actually there (correct totalProducts/pageCount).
+          await refreshProducts();
+        } else if (typeof setProducts === "function") {
+          setProducts((prevProducts) =>
+            prevProducts.map((product) => {
+              const id = product._id || product.id;
 
-            return id === productId
-              ? {
-                ...product,
-                ...updatedProduct,
-              }
-              : product;
-          })
-        );
+              return id === productId
+                ? {
+                  ...product,
+                  ...updatedProduct,
+                }
+                : product;
+            })
+          );
+        }
 
         await Swal.fire({
           title: "Product Updated Successfully",
@@ -134,10 +141,19 @@ const AddEditProduct = ({
           throw new Error("Product was not created");
         }
 
-        setProducts((prevProducts) => [
-          ...prevProducts,
-          newProduct,
-        ]);
+        if (typeof refreshProducts === "function") {
+          // Re-fetch instead of pushing the new product into local state.
+          // Pushing made the current page hold 11 items instead of 10 and
+          // never incremented totalProducts, so the pagination controls
+          // undercounted the pages and the new product could end up on a
+          // page the UI claimed didn't exist.
+          await refreshProducts();
+        } else if (typeof setProducts === "function") {
+          setProducts((prevProducts) => [
+            ...prevProducts,
+            newProduct,
+          ]);
+        }
 
         await Swal.fire({
           title: "Product Added Successfully",

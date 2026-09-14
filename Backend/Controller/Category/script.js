@@ -69,33 +69,33 @@ const getCategory = async (req, res) => {
 };
 const getSingleCategory = async (req, res) => {
     try {
-      const {id} = req.params
-      if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(400).json({
-            success:false,
-            message:"invalis categry id "
-        })
-      }
-      const category  = await Category.findById(id);
-      if(!category){
-        return res.status(400).json({
-            success:false,
-            message:"category not found"
-        })
-      }
-      const {search="",minprice,maxprie,page=1,limit=10,sort="createdAt",order="desc"} = req.query;
-      const pageNumber =  Number(page);
-      const limitNumber = Number(limit);
-      const matchStage = {};
-        if(search){
-            matchStage.name = {$regex: search, $options: "i"};
+        const { id } = req.params
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "invalis categry id "
+            })
         }
-        if(minprice || maxprie){
+        const category = await Category.findById(id);
+        if (!category) {
+            return res.status(400).json({
+                success: false,
+                message: "category not found"
+            })
+        }
+        const { search = "", minprice, maxprie, page = 1, limit = 10, sort = "createdAt", order = "desc" } = req.query;
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const matchStage = {};
+        if (search) {
+            matchStage.name = { $regex: search, $options: "i" };
+        }
+        if (minprice || maxprie) {
             matchStage.price = {};
-            if(minprice){
+            if (minprice) {
                 matchStage.price.$gte = Number(minprice);
             }
-            if(maxprie){
+            if (maxprie) {
                 matchStage.price.$lte = Number(maxprie);
             }
         }
@@ -104,7 +104,7 @@ const getSingleCategory = async (req, res) => {
             {
                 $match: {
                     ...matchStage,
-                    categoryID: new mongoose.Types.ObjectId(id) 
+                    categoryID: new mongoose.Types.ObjectId(id)
                 }
             },
             {

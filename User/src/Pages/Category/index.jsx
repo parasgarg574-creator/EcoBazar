@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";       
-const categoryProducts = ()=>{
-    const {id} = useParams()
-    const [products,setProducts] = useState([])
-    const [category,setCategory] = useState({})
-    const [loading,setLoading] = useState(true)
-    const getCategoryProducts = async()=>{
+import { useParams } from "react-router-dom";
+const categoryProducts = () => {
+    const { id } = useParams()
+    const [products, setProducts] = useState([])
+    const [category, setCategory] = useState({})
+    const [loading, setLoading] = useState(true)
+    const getCategoryProducts = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/getSingle/${id}`,{
+            const response = await fetch(`http://localhost:5000/getSingle/${id}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"

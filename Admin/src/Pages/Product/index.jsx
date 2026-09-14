@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
-import AddEditProduct from "./AddEdit";
+import AddEditProduct from "./AddEdit"
+import ReactPaginateRaw from "react-paginate";
+const ReactPaginate = ReactPaginateRaw?.default?.default || ReactPaginateRaw?.default || ReactPaginateRaw;
 import apimethods from "../../Methods/ApiClient";
-import Table from "../../Components/Table";
-import SearchFilter from "../../Components/SearchFilter";
+import Table from "../../Components/Table/index"
+import SearchFilter from "../../Components/SearchFilter/index";
 import permissions from "../../Methods/Permissions/script";
 const Product = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [active, setActive] = useState(1);
+    const [totalProducts, setTotalproducts] = useState(0)
     const [showForm, setShowForm] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [search, setSearch] = useState("");
@@ -17,21 +21,33 @@ const Product = () => {
     });
     const canEditProducts = permissions.isAllowed("updateProducts");
     const canDeleteProducts = permissions.isAllowed("deleteProducts");
+    const itemsperpage = 10;
     const getProducts = async () => {
         try {
-            const response = await apimethods.getApi("/all");
-            const data = response?.data?.data || response?.data || [];
+            const response = await apimethods.getApi(
+                `/all?page=${active}&limit=${itemsperpage}`
+            );
+
+            const responseData = response?.data;
+
+            const data = responseData?.data || [];
+
             setProducts(Array.isArray(data) ? data : []);
+
+            setTotalproducts(responseData?.totalProducts || 0);
         } catch (error) {
             console.error("Failed to get products:", error);
 
             Swal.fire({
                 title: "Failed to Load Products",
-                text: error?.response?.data?.message || "Something went wrong",
+                text:
+                    error?.response?.data?.message ||
+                    "Something went wrong",
                 icon: "error",
             });
         }
     };
+
     const getCategories = async () => {
         try {
             const response = await apimethods.getApi("/getcategory");
@@ -47,86 +63,95 @@ const Product = () => {
         }
     };
     useEffect(() => {
-        getProducts();
+        getProducts()
+    }, [active])
+    useEffect(() => {
         getCategories();
     }, []);
-const columns = [
-    {
-        key: "name",
-        label: "Product",
-    },
-    {
-        key: "category",
-        label: "Category",
-        render: (product) => product?.category?.name || "-",
-    },
-    {
-        key: "price",
-        label: "Price",
-        render: (product) => `₹${product?.price ?? 0}`,
-    },
-    {
-        key: "discount",
-        label: "Discount",
-        render: (product) => `${product?.discount ?? 0}%`,
-    },
-    {
-        key: "stock",
-        label: "Stock",
-    },
-{
-    key: "ispopular",
-    label: "Popular",
-    render: (product) => (
-        <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                product?.ispopular === true ||
-                product?.ispopular === "true"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-500"
-            }`}
-        >
-            {product?.ispopular === true ||
-            product?.ispopular === "true"
-                ? "Yes"
-                : "No"}
-        </span>
-    ),
-},
-{
-    key: "isfeatured",
-    label: "Featured",
-    render: (product) => (
-        <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                product?.isfeatured === true ||
-                product?.isfeatured === "true"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-500"
-            }`}
-        >
-            {product?.isfeatured === true ||
-            product?.isfeatured === "true"
-                ? "Yes"
-                : "No"}
-        </span>
-    ),
-},
-    {
-        key: "image",
-        label: "Image",
-        render: (product) =>
-            product?.image ? (
-                <img
-                    src={product.image}
-                    alt={product.name || "Product"}
-                    className="h-12 w-12 rounded object-cover"
-                />
-            ) : (
-                "-"
+    useEffect(() => {
+        setActive(1);
+    }, [search, filters]);
+    const pageCount = Math.max(1, Math.ceil(totalProducts / itemsperpage));
+    useEffect(() => {
+        if (active > pageCount) {
+            setActive(pageCount);
+        }
+    }, [pageCount, active]);
+    const columns = [
+        {
+            key: "name",
+            label: "Product",
+        },
+        {
+            key: "category",
+            label: "Category",
+            render: (product) => product?.category?.name || "-",
+        },
+        {
+            key: "price",
+            label: "Price",
+            render: (product) => `₹${product?.price ?? 0}`,
+        },
+        {
+            key: "discount",
+            label: "Discount",
+            render: (product) => `${product?.discount ?? 0}%`,
+        },
+        {
+            key: "stock",
+            label: "Stock",
+        },
+        {
+            key: "ispopular",
+            label: "Popular",
+            render: (product) => (
+                <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${product?.ispopular === true ||
+                        product?.ispopular === "true"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-500"
+                        }`}
+                >
+                    {product?.ispopular === true ||
+                        product?.ispopular === "true"
+                        ? "Yes"
+                        : "No"}
+                </span>
             ),
-    },
-];
+        },
+        {
+            key: "isfeatured",
+            label: "Featured",
+            render: (product) => (
+                <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${product?.isfeatured === true ||
+                        product?.isfeatured === "true"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-500"
+                        }`}
+                >
+                    {product?.isfeatured === true ||
+                        product?.isfeatured === "true"
+                        ? "Yes"
+                        : "No"}
+                </span>
+            ),
+        },
+        {
+            key: "image",
+            label: "Image",
+            render: (product) =>
+                product?.image ? (
+                    <img
+                        src={product.image}
+                        alt={product.name || "Product"}
+                        className="h-12 w-12 rounded object-cover"
+                    />
+                ) : (
+                    "-"
+                ),
+        },
+    ];
     const handleViewProduct = async (productId) => {
         if (!productId) {
             console.error("Product ID is missing");
@@ -264,12 +289,7 @@ const columns = [
             await apimethods.deleteApi(
                 `/deleteProduct/${productId}`
             );
-
-            setProducts((prevProducts) =>
-                prevProducts.filter(
-                    (product) => (product._id || product.id) !== productId
-                )
-            );
+            await getProducts();
 
             Swal.fire({
                 title: "Deleted!",
@@ -335,6 +355,13 @@ const columns = [
             );
         });
     }, [products, search, filters]);
+    // console.log({
+    //     Pagination,
+    //     Table,
+    //     SearchFilter,
+    //     AddEditProduct,
+    // });
+
     return (
         <>
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -353,6 +380,7 @@ const columns = [
                 <AddEditProduct
                     setShowForm={setShowForm}
                     setProducts={setProducts}
+                    refreshProducts={getProducts}
                     categories={categories}
                     editProduct={selectedProduct}
                 />
@@ -401,6 +429,27 @@ const columns = [
                         canEdit={canEditProducts}
                         canDelete={canDeleteProducts}
                     />
+                    <ReactPaginate
+                        previousLabel="← Previous"
+                        nextLabel="Next →"
+                        breakLabel="..."
+                        pageCount={pageCount}
+                        onPageChange={(selectedItem) => {
+                            setActive(selectedItem.selected + 1);
+                        }}
+                        forcePage={active - 1}
+                        pageRangeDisplayed={5}
+                        marginPagesDisplayed={1}
+                        containerClassName="flex items-center justify-center gap-2 mt-6"
+                        pageClassName="px-3 py-1 border rounded cursor-pointer"
+                        pageLinkClassName="cursor-pointer"
+                        previousClassName="px-3 py-1 border rounded cursor-pointer"
+                        nextClassName="px-3 py-1 border rounded cursor-pointer"
+                        breakClassName="px-3 py-1"
+                        activeClassName="bg-[#00491B] text-white"
+                        disabledClassName="opacity-50 cursor-not-allowed"
+                    />
+
                 </>
             )}
         </>

@@ -25,40 +25,47 @@ const getAllProducts = async (req, res) => {
       categoryID,
       minPrice,
       maxPrice,
-      page = 1,
-      limit = 10,
+      stock,
+      page,
+      limit,
       sort = "createdAt",
       order = "desc",
     } = req.query;
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
     const matchStage = {};
-    if (search) {
+    if (search && search.trim()) {
       matchStage.name = {
-        $regex: search,
+        $regex: search.trim(),
         $options: "i",
       };
     }
-    if (categoryID) {
+    if (categoryID && categoryID !== "all") {
       if (!mongoose.Types.ObjectId.isValid(categoryID)) {
         return res.status(400).json({
           success: false,
           message: "Invalid category ID",
         });
       }
+
       matchStage.categoryID = new mongoose.Types.ObjectId(categoryID);
+    }
+    if (stock === "inStock") {
+      matchStage.stock = { $gt: 0 };
+    } else if (stock === "outOfStock") {
+      matchStage.stock = { $lte: 0 };
     }
     if (minPrice || maxPrice) {
       matchStage.price = {};
+
       if (minPrice) {
         matchStage.price.$gte = Number(minPrice);
       }
+
       if (maxPrice) {
         matchStage.price.$lte = Number(maxPrice);
       }
     }
     const sortOrder = order === "asc" ? 1 : -1;
-    const products = await Product.aggregate([
+    const pipeline = [
       {
         $match: matchStage,
       },
@@ -72,7 +79,8 @@ const getAllProducts = async (req, res) => {
       },
       {
         $unwind: {
-          path: "$category",              
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -80,42 +88,54 @@ const getAllProducts = async (req, res) => {
           [sort]: sortOrder,
         },
       },
-      {
-        $skip: (pageNumber - 1) * limitNumber,
-      },
+    ];
+    if (page !== undefined || limit !== undefined) {
+      const pageNumber = Number(page) || 1;
+      const limitNumber = Number(limit) || 10;
 
-      {
-        $limit: limitNumber,
-      },
-      {
-        $project: {
-          name: 1,
-          price: 1,
-          discount: 1,
-          stock: 1,
-          description: 1,
-          image: 1,
-          createdAt: 1,
-          isfeatured: 1,
-          ispopular: 1,
-          updatedAt: 1,
-
-          category: {
-            _id: "$category._id",
-            name: "$category.name",
-          },
+      pipeline.push(
+        {
+          $skip: (pageNumber - 1) * limitNumber,
+        },
+        {
+          $limit: limitNumber,
+        }
+      );
+    }
+    pipeline.push({
+      $project: {
+        name: 1,
+        price: 1,
+        discount: 1,
+        stock: 1,
+        description: 1,
+        image: 1,
+        createdAt: 1,
+        isfeatured: 1,
+        ispopular: 1,
+        updatedAt: 1,
+        category: {
+          _id: "$category._id",
+          name: "$category.name",
         },
       },
-    ]);
+    });
+    const products = await Product.aggregate(pipeline);
     const totalProducts = await Product.countDocuments(matchStage);
-    res.status(200).json({
+    const response = {
       success: true,
       message: "Products fetched successfully",
       totalProducts,
-      currentPage: pageNumber,
-      totalPages: Math.ceil(totalProducts / limitNumber),
       data: products,
-    });
+    };
+    if (page !== undefined || limit !== undefined) {
+      const pageNumber = Number(page) || 1;
+      const limitNumber = Number(limit) || 10;
+
+      response.currentPage = pageNumber;
+      response.totalPages = Math.ceil(totalProducts / limitNumber);
+    }
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       success: false,
