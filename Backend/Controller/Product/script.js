@@ -81,7 +81,7 @@ const getAllProducts = async (req, res) => {
         $unwind: {
           path: "$category",
           preserveNullAndEmptyArrays: true,
-        },
+          },
       },
       {
         $sort: {
@@ -172,7 +172,6 @@ const getProductById = async (req, res) => {
           path: "$category",
         },
       },
-
       {
         $project: {
           name: 1,
