@@ -1,18 +1,38 @@
-import { Route, Routes } from 'react-router-dom'
-import Home from './Pages/Home'
-import Category from './Pages/Category'
-import Products from './Pages/Products'
-import ProductDetail from './Pages/ProductDetail'
+import { Route, Routes } from "react-router-dom";
+import Home from "./Pages/Home";
+import Category from "./Pages/Category";
+import CategoryDetail from "./Pages/CategoryDetail";
+import Products from "./Pages/Products";
+import ProductDetail from "./Pages/ProductDetail";
+import Wishlist from "./Pages/Wishlist";
+import Account from "./Pages/Account";
+import SignIn from "./Pages/SignIn";
+import SignUp from "./Pages/SignUp";
+import Cart from "./Pages/Cart";
+import { ShopProvider } from "./Context/ShopContext";
+import { AuthProvider } from "./Context/AuthContext";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/category/:id" element={<Category />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/products/:id" element={<ProductDetail />} />
-    </Routes>
-  )
+    <AuthProvider>
+      <ShopProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/category" element={<CategoryDetail />} />
+          <Route path="/category/:id" element={<Category />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/login" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/register" element={<SignUp />} />
+        </Routes>
+      </ShopProvider>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

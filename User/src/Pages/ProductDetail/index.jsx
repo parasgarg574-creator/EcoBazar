@@ -4,6 +4,7 @@ import Navbar from "../../Component/Navbar";
 import Breadcrumb from "../../Component/Breadcrumb";
 import ProductCard from "../../Component/ProductCard";
 import apimethods from "../../Methods/ApiClient";
+import { useShop } from "../../Context/ShopContext";
 import {
     FiShoppingCart,
     FiStar,
@@ -14,6 +15,7 @@ import {
     FiRefreshCw,
     FiAlertCircle,
     FiArrowLeft,
+    FiHeart,
 } from "react-icons/fi";
 
 const Skeleton = ({ className = "" }) => (
@@ -34,6 +36,7 @@ const StarRating = ({ rating = 4, max = 5 }) => (
 
 const ProductDetail = () => {
     const { id } = useParams();
+    const { isInWishlist, toggleWishlist, addToCart } = useShop();
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -256,47 +259,68 @@ const ProductDetail = () => {
 
                         <hr className="border-gray-100" />
 
-                        {/* Quantity + Add to Cart */}
-                        {isInStock && (
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                                {/* Quantity selector */}
-                                <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white overflow-hidden w-fit">
-                                    <button
-                                        onClick={() => handleQuantityChange(-1)}
-                                        disabled={quantity <= 1}
-                                        className="flex h-11 w-11 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition"
-                                    >
-                                        <FiMinus size={15} />
-                                    </button>
-                                    <span className="w-10 text-center text-sm font-semibold text-gray-900">
-                                        {quantity}
-                                    </span>
-                                    <button
-                                        onClick={() => handleQuantityChange(1)}
-                                        disabled={quantity >= stockCount}
-                                        className="flex h-11 w-11 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition"
-                                    >
-                                        <FiPlus size={15} />
-                                    </button>
-                                </div>
+                        {/* Quantity + Add to Cart + Wishlist */}
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                            {isInStock && (
+                                <>
+                                    {/* Quantity selector */}
+                                    <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white overflow-hidden w-fit">
+                                        <button
+                                            onClick={() => handleQuantityChange(-1)}
+                                            disabled={quantity <= 1}
+                                            className="flex h-11 w-11 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition"
+                                        >
+                                            <FiMinus size={15} />
+                                        </button>
+                                        <span className="w-10 text-center text-sm font-semibold text-gray-900">
+                                            {quantity}
+                                        </span>
+                                        <button
+                                            onClick={() => handleQuantityChange(1)}
+                                            disabled={quantity >= stockCount}
+                                            className="flex h-11 w-11 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition"
+                                        >
+                                            <FiPlus size={15} />
+                                        </button>
+                                    </div>
 
-                                {/* Add to Cart button */}
-                                <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-600 py-3 px-8 text-sm font-bold text-white hover:bg-green-700 transition shadow-sm shadow-green-200 sm:flex-none">
+                                    {/* Add to Cart button */}
+                                    <button
+                                        onClick={() => addToCart(product?.data || product, quantity, true)}
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-600 py-3 px-8 text-sm font-bold text-white hover:bg-green-700 transition shadow-sm shadow-green-200 sm:flex-none"
+                                    >
+                                        <FiShoppingCart size={16} />
+                                        Add to Cart
+                                    </button>
+                                </>
+                            )}
+
+                            {!isInStock && (
+                                <button
+                                    disabled
+                                    className="flex items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 px-8 text-sm font-bold text-gray-400 cursor-not-allowed w-full sm:w-auto"
+                                >
                                     <FiShoppingCart size={16} />
-                                    Add to Cart
+                                    Out of Stock
                                 </button>
-                            </div>
-                        )}
+                            )}
 
-                        {!isInStock && (
+                            {/* Wishlist Button */}
                             <button
-                                disabled
-                                className="flex items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 px-8 text-sm font-bold text-gray-400 cursor-not-allowed w-full sm:w-auto"
+                                onClick={() => toggleWishlist(product?.data || product)}
+                                className={`flex items-center justify-center gap-2 rounded-xl border py-3 px-5 text-sm font-semibold transition ${
+                                    isInWishlist(id)
+                                        ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                                }`}
                             >
-                                <FiShoppingCart size={16} />
-                                Out of Stock
+                                <FiHeart
+                                    size={16}
+                                    className={isInWishlist(id) ? "fill-red-500 text-red-500" : ""}
+                                />
+                                <span>{isInWishlist(id) ? "In Wishlist" : "Wishlist"}</span>
                             </button>
-                        )}
+                        </div>
 
                         {/* Trust badges */}
                         <div className="grid grid-cols-3 gap-3 pt-2">

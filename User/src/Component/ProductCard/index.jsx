@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { FiShoppingCart, FiStar } from "react-icons/fi";
+import { FiShoppingCart, FiStar, FiHeart } from "react-icons/fi";
+import { useShop } from "../../Context/ShopContext";
 
 const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 /**
- * Reusable ProductCard component.
+ * Reusable ProductCard component with Wishlist and Cart support.
  *
  * Props:
  *   product: { _id, name, price, discount, stock, image, category }
@@ -12,6 +13,7 @@ const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
  */
 const ProductCard = ({ product, variant = "default" }) => {
     const navigate = useNavigate();
+    const { isInWishlist, toggleWishlist, addToCart } = useShop();
 
     if (!product) return null;
 
@@ -24,6 +26,7 @@ const ProductCard = ({ product, variant = "default" }) => {
         image,
     } = product;
 
+    const isWishlisted = isInWishlist(_id);
     const isInStock = Number(stock) > 0;
     const discountPercent = Number(discount) || 0;
     const originalPrice = discountPercent > 0
@@ -31,6 +34,18 @@ const ProductCard = ({ product, variant = "default" }) => {
         : null;
 
     const handleClick = () => navigate(`/products/${_id}`);
+
+    const handleWishlistToggle = (e) => {
+        e.stopPropagation();
+        toggleWishlist(product);
+    };
+
+    const handleAddToCart = (e) => {
+        e.stopPropagation();
+        if (isInStock) {
+            addToCart(product, 1, true);
+        }
+    };
 
     const handleImageError = (e) => {
         e.target.src = FALLBACK_IMAGE;
@@ -48,6 +63,22 @@ const ProductCard = ({ product, variant = "default" }) => {
                         -{discountPercent}%
                     </span>
                 )}
+
+                {/* Wishlist button */}
+                <button
+                    onClick={handleWishlistToggle}
+                    aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    className={`absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+                        isWishlisted
+                            ? "text-red-500"
+                            : "text-gray-400 hover:text-red-500"
+                    }`}
+                >
+                    <FiHeart
+                        size={14}
+                        className={isWishlisted ? "fill-red-500 text-red-500" : ""}
+                    />
+                </button>
 
                 {/* Image */}
                 <div className="w-full aspect-square flex items-center justify-center overflow-hidden rounded-lg bg-gray-50 mb-2">
@@ -98,6 +129,22 @@ const ProductCard = ({ product, variant = "default" }) => {
                 )}
             </div>
 
+            {/* Wishlist Button */}
+            <button
+                onClick={handleWishlistToggle}
+                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                className={`absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+                    isWishlisted
+                        ? "text-red-500"
+                        : "text-gray-400 hover:text-red-500"
+                }`}
+            >
+                <FiHeart
+                    size={16}
+                    className={isWishlisted ? "fill-red-500 text-red-500" : ""}
+                />
+            </button>
+
             {/* Image */}
             <div className="relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio: "4/3" }}>
                 <img
@@ -135,16 +182,12 @@ const ProductCard = ({ product, variant = "default" }) => {
 
                 {/* Add to Cart */}
                 <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        // Cart functionality is out of scope — navigate to detail instead
-                        navigate(`/products/${_id}`);
-                    }}
+                    onClick={handleAddToCart}
                     disabled={!isInStock}
                     className="mt-3 w-full flex items-center justify-center gap-2 rounded-lg bg-green-600 py-2 text-xs font-semibold text-white transition hover:bg-green-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
                     <FiShoppingCart size={13} />
-                    {isInStock ? "View Details" : "Out of Stock"}
+                    {isInStock ? "Add to Cart" : "Out of Stock"}
                 </button>
             </div>
         </div>

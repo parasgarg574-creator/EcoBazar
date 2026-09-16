@@ -9,14 +9,12 @@ import { FiAlertCircle, FiPackage } from "react-icons/fi";
 const Skeleton = ({ className = "" }) => (
     <div className={`animate-pulse bg-gray-200 rounded-xl ${className}`} />
 );
-
 const CategoryProducts = () => {
     const { id } = useParams();
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         if (!id) return;
 
@@ -39,6 +37,7 @@ const CategoryProducts = () => {
                     })
                 ]);
                 const catData = await catRes.json();
+                console.log(catData.data)   
                 const prodData = await prodRes.json();
                 const found = catData.data.find((c) => c._id === id);
                 setCategory(found || null);
@@ -49,11 +48,8 @@ const CategoryProducts = () => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [id]);
-
-    // Labels for breadcrumb: maps the category id → category name
     const breadcrumbLabels = {
         category: "Category",
         [id]: category?.name || "Category",
@@ -65,8 +61,6 @@ const CategoryProducts = () => {
             <Breadcrumb labels={breadcrumbLabels} />
 
             <main className="flex-1 mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-8">
-
-                {/* Page header */}
                 <div className="mb-8">
                     {loading ? (
                         <Skeleton className="h-8 w-48" />
@@ -83,8 +77,6 @@ const CategoryProducts = () => {
                         </>
                     )}
                 </div>
-
-                {/* Error state */}
                 {error && (
                     <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
                         <FiAlertCircle size={48} className="text-red-400" />
@@ -97,8 +89,6 @@ const CategoryProducts = () => {
                         </button>
                     </div>
                 )}
-
-                {/* Loading state */}
                 {loading && !error && (
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                         {Array.from({ length: 10 }).map((_, i) => (
@@ -106,8 +96,6 @@ const CategoryProducts = () => {
                         ))}
                     </div>
                 )}
-
-                {/* Empty state */}
                 {!loading && !error && products.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
                         <FiPackage size={56} className="text-gray-300" />
@@ -117,8 +105,6 @@ const CategoryProducts = () => {
                         </p>
                     </div>
                 )}
-
-                {/* Product grid */}
                 {!loading && !error && products.length > 0 && (
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                         {products.map((product) => (
@@ -126,10 +112,8 @@ const CategoryProducts = () => {
                         ))}
                     </div>
                 )}
-
             </main>
         </div>
     );
 };
-
 export default CategoryProducts;

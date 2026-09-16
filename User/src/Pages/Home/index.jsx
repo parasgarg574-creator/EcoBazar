@@ -22,49 +22,49 @@ const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const [catRes, prodRes] = await Promise.all([
-                fetch("http://localhost:5000/getcategory", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }),
-                fetch("http://localhost:5000/all", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }),
-            ]);
-            if (!catRes.ok || !prodRes.ok) {
-                throw new Error("Failed to fetch home data");
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [catRes, prodRes] = await Promise.all([
+                    fetch("http://localhost:5000/getcategory", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }),
+                    fetch("http://localhost:5000/all", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }),
+                ]);
+                if (!catRes.ok || !prodRes.ok) {
+                    throw new Error("Failed to fetch home data");
+                }
+                const catData = await catRes.json();
+                const prodData = await prodRes.json();
+                const allCategories = catData.data || [];
+                const allProducts = prodData.data || [];
+                setPopularCategories(
+                    allCategories.filter((c) => c.ispopular)
+                );
+
+                setPopularProducts(
+                    allProducts.filter((p) => p.ispopular)
+                );
+                setFeaturedProducts(
+                    allProducts.filter((p) => p.isfeatured)
+                );
+            } catch (err) {
+                console.error("Failed to load home data:", err);
+            } finally {
+                setLoading(false);
             }
-            const catData = await catRes.json();
-            const prodData = await prodRes.json();
-            const allCategories = catData.data || [];
-            const allProducts = prodData.data || [];
-            setPopularCategories(
-                allCategories.filter((c) => c.ispopular)
-            );
+        };
 
-            setPopularProducts(
-                allProducts.filter((p) => p.ispopular)
-            );
-            setFeaturedProducts(
-                allProducts.filter((p) => p.isfeatured)
-            );
-        } catch (err) {
-            console.error("Failed to load home data:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    fetchData();
-}, []);
+        fetchData();
+    }, []);
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
@@ -72,84 +72,114 @@ useEffect(() => {
             <main className="flex-1 w-full">
                 <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 space-y-12">
                     <section aria-label="Promotions">
-                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:grid-rows-2 lg:h-[450px]">
-                            <div className="group relative overflow-hidden rounded-2xl min-h-[320px] lg:row-span-2">
+                        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-[2fr_1fr] md:h-[450px]">
+
+                            {/* Main Banner */}
+                            <div className="group relative min-h-[300px] overflow-hidden rounded-md md:min-h-0">
                                 <img
                                     src="/banner-main.jpg"
                                     alt="Fresh and healthy organic food"
                                     className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-r from-green-950/95 via-green-800/70 to-transparent" />
-                                <div className="absolute left-7 top-1/2 -translate-y-1/2 text-white max-w-[380px] md:left-10">
-                                    <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-                                        Fresh &amp; Healthy<br />Organic Food
+
+                                <div className="absolute inset-0 bg-gradient-to-r from-green-950/95 via-green-900/65 to-transparent" />
+
+                                <div className="absolute left-6 top-1/2 max-w-[330px] -translate-y-1/2 text-white md:left-8">
+                                    <h1 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
+                                        Fresh &amp; Healthy<br />
+                                        Organic Food
                                     </h1>
-                                    <div className="mt-4 flex items-center gap-2">
-                                        <span className="text-sm text-white/80">Sale up to</span>
-                                        <span className="rounded-lg bg-orange-500 px-2.5 py-1 text-xs font-bold">
+
+                                    <div className="mt-3 flex items-center gap-2">
+                                        <span className="text-[10px] text-white/80">
+                                            Sale up to
+                                        </span>
+
+                                        <span className="rounded-sm bg-orange-500 px-2 py-1 text-[9px] font-bold">
                                             30% OFF
                                         </span>
                                     </div>
-                                    <p className="mt-2 text-xs text-white/70">
-                                        Free shipping on all your orders
+
+                                    <p className="mt-1 text-[9px] text-white/70">
+                                        Free shipping on all your order
                                     </p>
+
                                     <button
                                         onClick={() => navigate("/products")}
-                                        className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-7 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-500 hover:text-white"
+                                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-[10px] font-bold text-green-700 transition hover:bg-green-500 hover:text-white"
                                     >
-                                        Shop Now <span>→</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="group relative overflow-hidden rounded-2xl min-h-[200px]">
-                                <img
-                                    src="/banner-sale.jpg"
-                                    alt="Summer sale on fresh vegetables"
-                                    className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/75 to-transparent" />
-                                <div className="absolute left-6 top-1/2 -translate-y-1/2">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-green-700">
-                                        Summer Sale
-                                    </p>
-                                    <h2 className="mt-1 text-4xl font-extrabold text-gray-900 leading-none">
-                                        75%<span className="text-2xl"> OFF</span>
-                                    </h2>
-                                    <p className="mt-1 text-[11px] text-gray-500">
-                                        Only Fruits &amp; Vegetables
-                                    </p>
-                                    <button
-                                        onClick={() => navigate("/products")}
-                                        className="mt-3 text-xs font-bold text-green-700 hover:text-green-900 transition"
-                                    >
-                                        Shop Now →
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="group relative overflow-hidden rounded-2xl min-h-[200px]">
-                                <img
-                                    src="/banner-deal.jpg"
-                                    alt="Best deal of the month"
-                                    className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-r from-green-950/92 via-green-900/65 to-green-900/20" />
-                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-white">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-green-400">
-                                        Best Deal
-                                    </p>
-                                    <h2 className="mt-1 text-xl font-extrabold leading-tight sm:text-2xl">
-                                        Special Products<br />Deal of the Month
-                                    </h2>
-                                    <button
-                                        onClick={() => navigate("/products")}
-                                        className="mt-3 text-xs font-bold text-green-400 hover:text-green-300 transition"
-                                    >
-                                        Shop Now →
+                                        Shop now
+                                        <span>→</span>
                                     </button>
                                 </div>
                             </div>
 
+                            {/* Right Banners */}
+                            <div className="grid grid-cols-1 gap-2.5 md:grid-rows-2">
 
+                                {/* Summer Sale */}
+                                <div className="group relative min-h-[180px] overflow-hidden rounded-md md:min-h-0">
+                                    <img
+                                        src="/banner-sale.jpg"
+                                        alt="Summer sale on fresh vegetables"
+                                        className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                    />
+
+                                    <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/75 to-transparent" />
+
+                                    <div className="absolute left-5 top-1/2 -translate-y-1/2">
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-600">
+                                            Summer Sale
+                                        </p>
+
+                                        <h2 className="mt-1 text-2xl font-extrabold leading-none text-gray-900">
+                                            75%
+                                            <span className="text-base"> OFF</span>
+                                        </h2>
+
+                                        <p className="mt-1 text-[8px] text-gray-500">
+                                            Only Fruits &amp; Vegetables
+                                        </p>
+
+                                        <button
+                                            onClick={() => navigate("/products")}
+                                            className="mt-2 text-[9px] font-bold text-green-700 transition hover:text-green-900"
+                                        >
+                                            Shop Now →
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Deal of the Month */}
+                                <div className="group relative min-h-[180px] overflow-hidden rounded-md md:min-h-0">
+                                    <img
+                                        src="/banner-deal.jpg"
+                                        alt="Best deal of the month"
+                                        className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                    />
+
+                                    <div className="absolute inset-0 bg-gradient-to-r from-green-950/95 via-green-900/70 to-transparent" />
+
+                                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-white">
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-green-400">
+                                            Best Deal
+                                        </p>
+
+                                        <h2 className="mt-1 text-lg font-bold leading-tight">
+                                            Special Products<br />
+                                            Deal of the Month
+                                        </h2>
+
+                                        <button
+                                            onClick={() => navigate("/products")}
+                                            className="mt-2 text-[9px] font-bold text-green-400 transition hover:text-green-300"
+                                        >
+                                            Shop Now →
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </section>
                     <section
@@ -172,7 +202,7 @@ useEffect(() => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-2xl font-bold text-gray-900">Popular Categories</h2>
                             <Link
-                                to="/products"
+                                to="/category"
                                 className="flex items-center gap-1 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors"
                             >
                                 View All <span className="text-base">→</span>
