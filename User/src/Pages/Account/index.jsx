@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../Component/Navbar";
 import Breadcrumb from "../../Component/Breadcrumb";
 import { useAuth } from "../../Context/AuthContext";
 import { useShop } from "../../Context/ShopContext";
 import Environment from "../../Environemnt/script";
+import apimethods from "../../Methods/ApiClient";
 import {
     FiUser,
     FiMail,
@@ -18,6 +19,7 @@ import {
     FiShoppingBag,
     FiArrowRight,
     FiShield,
+    FiPackage,
 } from "react-icons/fi";
 
 const Account = () => {
@@ -206,6 +208,28 @@ const Account = () => {
         }
     };
 
+    const [userOrders, setUserOrders] = useState([]);
+    const [ordersLoading, setOrdersLoading] = useState(false);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            setOrdersLoading(true);
+            apimethods
+                .getApi("/getorder")
+                .then((res) => {
+                    if (res.data?.success && Array.isArray(res.data.orders)) {
+                        setUserOrders(res.data.orders);
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error fetching user orders:", err);
+                })
+                .finally(() => {
+                    setOrdersLoading(false);
+                });
+        }
+    }, [isLoggedIn]);
+
     // ── Logged In User Dashboard ────────────────────────────────────────────────
     if (isLoggedIn && user) {
         return (
@@ -295,6 +319,45 @@ const Account = () => {
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Recent Orders Section */}
+                        <div className="rounded-3xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm space-y-4">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <FiPackage className="text-[#00B207]" />
+                                <span>Recent Orders</span>
+                            </h2>
+
+                            {ordersLoading ? (
+                                <div className="py-8 text-center text-gray-400 text-sm">
+                                    Loading your order history...
+                                </div>
+                            ) : userOrders.length === 0 ? (
+                                <div className="py-8 text-center text-gray-400 text-sm">
+                                    No orders placed yet.
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-gray-100">
+                                    {userOrders.map((ord) => (
+                                        <div key={ord._id} className="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm">
+                                            <div>
+                                                <span className="font-mono text-xs font-semibold text-gray-700">#{ord._id}</span>
+                                                <p className="text-xs text-gray-500">
+                                                    {new Date(ord.createdAt).toLocaleDateString()} • {ord.orderItems?.length || 0} item(s)
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 capitalize">
+                                                    {ord.paymentStatus}
+                                                </span>
+                                                <span className="font-bold text-gray-900">
+                                                    ${Number(ord.totalAmount || 0).toFixed(2)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Store Navigation Banner */}

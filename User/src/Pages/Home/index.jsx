@@ -3,16 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../Component/Navbar";
 import ProductCard from "../../Component/ProductCard";
 import apimethods from "../../Methods/ApiClient";
-
-// ── Feature badges shown below the hero ──────────────────────────────────────
 const FEATURES = [
     { icon: "🚚", title: "Free Shipping", desc: "Free shipping on all orders" },
     { icon: "🕐", title: "24/7 Support", desc: "Instant access to support" },
     { icon: "🔒", title: "Secure Payment", desc: "100% secure transactions" },
     { icon: "↩️", title: "Easy Returns", desc: "30-day money-back guarantee" },
 ];
-
-// ── Loading skeleton for product/category cards ───────────────────────────────
 const Skeleton = ({ className = "" }) => (
     <div className={`animate-pulse bg-gray-200 rounded-xl ${className}`} />
 );
@@ -49,7 +45,6 @@ const Home = () => {
                 setPopularCategories(
                     allCategories.filter((c) => c.ispopular)
                 );
-
                 setPopularProducts(
                     allProducts.filter((p) => p.ispopular)
                 );
@@ -62,10 +57,8 @@ const Home = () => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, []);
-
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
             <Navbar />
@@ -73,37 +66,29 @@ const Home = () => {
                 <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 space-y-12">
                     <section aria-label="Promotions">
                         <div className="grid grid-cols-1 gap-2.5 md:grid-cols-[2fr_1fr] md:h-[450px]">
-
-                            {/* Main Banner */}
                             <div className="group relative min-h-[300px] overflow-hidden rounded-md md:min-h-0">
                                 <img
                                     src="/banner-main.jpg"
                                     alt="Fresh and healthy organic food"
                                     className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                 />
-
                                 <div className="absolute inset-0 bg-gradient-to-r from-green-950/95 via-green-900/65 to-transparent" />
-
                                 <div className="absolute left-6 top-1/2 max-w-[330px] -translate-y-1/2 text-white md:left-8">
                                     <h1 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
                                         Fresh &amp; Healthy<br />
                                         Organic Food
                                     </h1>
-
                                     <div className="mt-3 flex items-center gap-2">
                                         <span className="text-[10px] text-white/80">
                                             Sale up to
                                         </span>
-
                                         <span className="rounded-sm bg-orange-500 px-2 py-1 text-[9px] font-bold">
                                             30% OFF
                                         </span>
                                     </div>
-
                                     <p className="mt-1 text-[9px] text-white/70">
                                         Free shipping on all your order
                                     </p>
-
                                     <button
                                         onClick={() => navigate("/products")}
                                         className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-[10px] font-bold text-green-700 transition hover:bg-green-500 hover:text-white"
@@ -113,11 +98,7 @@ const Home = () => {
                                     </button>
                                 </div>
                             </div>
-
-                            {/* Right Banners */}
                             <div className="grid grid-cols-1 gap-2.5 md:grid-rows-2">
-
-                                {/* Summer Sale */}
                                 <div className="group relative min-h-[180px] overflow-hidden rounded-md md:min-h-0">
                                     <img
                                         src="/banner-sale.jpg"
@@ -149,8 +130,6 @@ const Home = () => {
                                         </button>
                                     </div>
                                 </div>
-
-                                {/* Deal of the Month */}
                                 <div className="group relative min-h-[180px] overflow-hidden rounded-md md:min-h-0">
                                     <img
                                         src="/banner-deal.jpg"

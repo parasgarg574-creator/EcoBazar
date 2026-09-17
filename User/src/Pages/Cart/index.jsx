@@ -24,13 +24,17 @@ const Cart = () => {
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     const [couponError, setCouponError] = useState("");         
     const handleProceed = () => {
+        if (!cart || cart.length === 0) {
+            setToastMessage?.("Your cart is empty! Add products before checking out.");
+            return;
+        }
         if (!isLoggedIn) {
             navigate("/signin", {
-                state: { from: { pathname: "/cart" } },
+                state: { from: { pathname: "/checkout" } },
             });
             return;
         }
-        navigate("/account");
+        navigate("/checkout");
     };
     const handleApplyCoupon = (e) => {
         e.preventDefault();

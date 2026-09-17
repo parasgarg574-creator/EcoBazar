@@ -151,6 +151,28 @@ export const ShopProvider = ({ children }) => {
         }, 0);
     }, [cart]);
     const wishlistCount = wishlist.length;
+    const SHIPPING_STORAGE_KEY = "ecobazar_shipping";
+    const [shippingAddress, setShippingAddress] = useState(() => {
+        try {
+            const saved = localStorage.getItem(SHIPPING_STORAGE_KEY);
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
+
+    useEffect(() => {
+        try {
+            if (shippingAddress) {
+                localStorage.setItem(SHIPPING_STORAGE_KEY, JSON.stringify(shippingAddress));
+            } else {
+                localStorage.removeItem(SHIPPING_STORAGE_KEY);
+            }
+        } catch (e) {
+            console.error("Failed to persist shipping address", e);
+        }
+    }, [shippingAddress]);
+
     const value = {
         wishlist,
         wishlistCount,
@@ -171,6 +193,8 @@ export const ShopProvider = ({ children }) => {
         removeFromCart,
         updateCartQuantity,
         clearCart,
+        shippingAddress,
+        setShippingAddress,
         toastMessage,
         setToastMessage,
     };

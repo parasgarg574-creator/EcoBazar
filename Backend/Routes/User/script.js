@@ -1,0 +1,14 @@
+const { authMiddleware, isAdmin } = require("../../Middleware/AuthMiddleware/script");
+const { registerUser, loginUser, getUserProfile, updateUser, deleteUser, getUsers, getCustomers, deleteUserByAdmin, updateUserByAdmin } = require("../../Controller/User/script");
+const express = require("express");
+const router = express.Router();
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/profile", authMiddleware, getUserProfile);
+router.put("/profile", authMiddleware, updateUser);
+router.delete("/profile", authMiddleware, deleteUser);
+router.get("/", getUsers);
+router.get("/customers", authMiddleware, isAdmin, getCustomers);
+router.delete("/:id", authMiddleware, isAdmin, deleteUserByAdmin);
+router.put("/:id", authMiddleware, isAdmin, updateUserByAdmin);
+module.exports = router;

@@ -235,20 +235,7 @@ const Products = () => {
     };
     const hasActiveFilters = !!(searchQuery || categoryFilter || searchParams.get("minPrice") || searchParams.get("maxPrice"));
     const activeCategoryName = categories.find((c) => c._id === categoryFilter)?.name;
-    const filterPanelProps = {
-        categories,
-        categoryFilter,
-        localSearch,
-        setLocalSearch,
-        localMinPrice,
-        setLocalMinPrice,
-        localMaxPrice,
-        setLocalMaxPrice,
-        hasActiveFilters,
-        onCategoryChange: handleCategoryChange,
-        onApply: applyFilters,
-        onClear: clearFilters,
-    };
+    const filterPanelProps = { categories, categoryFilter, localSearch, setLocalSearch, localMinPrice, setLocalMinPrice, localMaxPrice, setLocalMaxPrice, hasActiveFilters, onCategoryChange: handleCategoryChange, onApply: applyFilters, onClear: clearFilters,};
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
             <Navbar />
@@ -381,7 +368,6 @@ const Products = () => {
                                                     </button>
                                                 )
                                             )}
-
                                         <button
                                             onClick={() => handlePageChange(currentPage + 1)}
                                             disabled={currentPage === totalPages}
@@ -396,8 +382,6 @@ const Products = () => {
                     </div>
                 </div>
             </main>
-
-            {/* Mobile filter drawer */}
             {showFilters && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                     <div

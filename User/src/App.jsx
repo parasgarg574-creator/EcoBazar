@@ -9,6 +9,7 @@ import Account from "./Pages/Account";
 import SignIn from "./Pages/SignIn";
 import SignUp from "./Pages/SignUp";
 import Cart from "./Pages/Cart";
+import Checkout from "./Pages/Checkout";
 import { ShopProvider } from "./Context/ShopContext";
 import { AuthProvider } from "./Context/AuthContext";
 
@@ -24,6 +25,8 @@ function App() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/*" element={<Checkout />} />
           <Route path="/account" element={<Account />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/login" element={<SignIn />} />

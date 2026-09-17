@@ -8,6 +8,7 @@ import Product from "./Pages/Product";
 import Dashboard from "./Pages/Dashboard";
 import ContentManagement from "./Pages/Content";
 import Faq from "./Pages/Faq";
+// import Customers from "./Pages/Customer";
 
 const Login = React.lazy(() => import("./Authentication/Login"));
 const Forgot = React.lazy(() => import("./Authentication/ForgotPassword"));
@@ -18,7 +19,6 @@ const PageFallback = () => (
     <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-200 border-t-green-600" />
   </div>
 );
-
 function App() {
   return (
     <Suspense fallback={<PageFallback />}>
@@ -41,6 +41,7 @@ function App() {
           <Route path="products" element={<Product />} />
           <Route path="content-management" element={<ContentManagement />} />
           <Route path="faqs" element={<Faq />} />
+          {/* <Route path="customers" element={<Customers />} /> */}
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

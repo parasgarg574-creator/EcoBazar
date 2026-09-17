@@ -5,66 +5,52 @@ import Breadcrumb from "../../Component/Breadcrumb";
 import { useAuth } from "../../Context/AuthContext";
 import Environment from "../../Environemnt/script";
 import { FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
-
 const SignUp = () => {
-    const { login } = useAuth();
     const navigate = useNavigate();
-
+    const { login } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [acceptTerms, setAcceptTerms] = useState(false);
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
     const [errors, setErrors] = useState({});
     const [apiError, setApiError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [loading, setLoading] = useState(false);
-
     const apiUrl = Environment.api || "http://localhost:5000";
-
     const validate = () => {
         const newErrors = {};
-
         if (!email.trim()) {
             newErrors.email = "Email is required";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             newErrors.email = "Please enter a valid email address";
         }
-
         if (!password) {
             newErrors.password = "Password is required";
         } else if (password.length < 6) {
             newErrors.password = "Password must be at least 6 characters";
         }
-
         if (!confirmPassword) {
             newErrors.confirmPassword = "Confirm password is required";
         } else if (password !== confirmPassword) {
             newErrors.confirmPassword = "Passwords do not match";
         }
-
         if (!acceptTerms) {
             newErrors.acceptTerms = "Please accept the Terms & Conditions";
         }
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
-    const handleSubmit = async (e) => {
+    const   handleSubmit = async (e) => {
         e.preventDefault();
         setApiError(null);
         setSuccessMessage(null);
-
         if (!validate()) return;
-
         setLoading(true);
         try {
             const derivedName = email.split("@")[0] || "User";
-            const res = await fetch(`${apiUrl}/public/register`, {
+            const res = await fetch(`${apiUrl}/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -75,16 +61,12 @@ const SignUp = () => {
                     password,
                 }),
             });
-
             const data = await res.json();
-
             if (!res.ok || !data.success) {
                 throw new Error(data.message || "Failed to create account. Please try again.");
             }
-
-            // Attempt automatic login after successful registration
             try {
-                const loginRes = await fetch(`${apiUrl}/public/login`, {
+                const loginRes = await fetch(`${apiUrl}/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -101,9 +83,7 @@ const SignUp = () => {
                     return;
                 }
             } catch {
-                // If auto-login fails, redirect to signin
             }
-
             setSuccessMessage("Account created successfully! Redirecting to sign in...");
             setTimeout(() => {
                 navigate("/signin", { state: { email } });
@@ -114,7 +94,6 @@ const SignUp = () => {
             setLoading(false);
         }
     };
-
     return (
         <div className="flex flex-col min-h-screen bg-[#F7F8F9]">
             <Navbar />

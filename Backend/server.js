@@ -10,6 +10,8 @@ const StaffRoutes = require("./Routes/Staff/script");
 const ProductRoutes = require("./Routes/Product/script");
 const ContentRoutes = require("./Routes/Content/script");
 const FaqRoutes = require("./Routes/Faq/script");
+const OrderRoutes = require("./Routes/Order/script");
+const UserRoutes = require("./Routes/User/script");
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -22,6 +24,8 @@ app.use("/", StaffRoutes);
 app.use("/",ProductRoutes);
 app.use("/",ContentRoutes);
 app.use("/",FaqRoutes);
+app.use("/",OrderRoutes);
+app.use("/",UserRoutes);
 app.use(
     "/uploads",
     express.static(path.join(__dirname, "Middleware", "uploads"))
