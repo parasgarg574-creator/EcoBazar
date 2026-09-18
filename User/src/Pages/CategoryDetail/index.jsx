@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Component/Navbar";
+import Footer from "../../Component/Footer";
 import Breadcrumb from "../../Component/Breadcrumb";
 import { FiSearch, FiX, FiAlertCircle, FiGrid, FiArrowRight, FiStar } from "react-icons/fi";
 import Environment from "../../Environemnt/script";
@@ -242,24 +243,7 @@ const CategoryDetail = () => {
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="mt-auto border-t border-gray-200 bg-white py-8">
-                <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-                        <div className="flex items-center gap-2">
-                            <img src="/Logo (1).png" alt="EcoBazar" className="h-8 w-auto object-contain" />
-                        </div>
-                        <p className="text-xs text-gray-400 text-center">
-                            © 2026 EcoBazar. All rights reserved. Fresh &amp; Organic Food.
-                        </p>
-                        <div className="flex gap-4 text-xs text-gray-400">
-                            <a href="#" className="hover:text-green-600 transition-colors">Privacy</a>
-                            <a href="#" className="hover:text-green-600 transition-colors">Terms</a>
-                            <a href="#" className="hover:text-green-600 transition-colors">Contact</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

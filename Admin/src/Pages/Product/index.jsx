@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import AddEditProduct from "./AddEdit"
 import ReactPaginateRaw from "react-paginate";
@@ -8,6 +9,7 @@ import Table from "../../Components/Table/index"
 import SearchFilter from "../../Components/SearchFilter/index";
 import permissions from "../../Methods/Permissions/script";
 const Product = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [active, setActive] = useState(1);
@@ -152,86 +154,12 @@ const Product = () => {
                 ),
         },
     ];
-    const handleViewProduct = async (productId) => {
+    const handleViewProduct = (productId) => {
         if (!productId) {
             console.error("Product ID is missing");
             return;
         }
-        try {
-            const response = await apimethods.getApi(
-                `/getProduct/${productId}`
-            );
-            const product = response?.data?.data || response?.data;
-            if (!product) {
-                throw new Error("Product not found");
-            }
-            Swal.fire({
-                title: product.name || "Product Details",
-
-                html: `
-          <div style="text-align: left">
-
-            ${product.image
-                        ? `
-                  <img
-                    src="${product.image}"
-                    alt="${product.name || "Product"}"
-                    style="
-                      width: 100%;
-                      max-height: 220px;
-                      object-fit: cover;
-                      border-radius: 8px;
-                      margin-bottom: 15px;
-                    "
-                  />
-                `
-                        : ""
-                    }
-
-            <p>
-              <strong>Name:</strong>
-              ${product.name || "-"}
-            </p>
-
-            <p>
-              <strong>Category:</strong>
-              ${product.category?.name || "-"}
-            </p>
-
-            <p>
-              <strong>Price:</strong>
-              ₹${product.price ?? 0}
-            </p>
-
-            <p>
-              <strong>Discount:</strong>
-              ${product.discount ?? 0}%
-            </p>
-
-            <p>
-              <strong>Stock:</strong>
-              ${product.stock ?? 0}
-            </p>
-
-            <p>
-              <strong>Description:</strong>
-              ${product.description || "-"}
-            </p>
-
-          </div>
-        `,
-
-                confirmButtonColor: "#00491B",
-            });
-        } catch (error) {
-            console.error("Failed to get product:", error);
-
-            Swal.fire({
-                title: "Failed to Get Product",
-                text: error?.response?.data?.message || "Something went wrong",
-                icon: "error",
-            });
-        }
+                navigate(`/dashboard/details/products/${productId}`);
     };
     const handleEditProduct = async (productId) => {
         if (!canEditProducts) return;
@@ -355,13 +283,6 @@ const Product = () => {
             );
         });
     }, [products, search, filters]);
-    // console.log({
-    //     Pagination,
-    //     Table,
-    //     SearchFilter,
-    //     AddEditProduct,
-    // });
-
     return (
         <>
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

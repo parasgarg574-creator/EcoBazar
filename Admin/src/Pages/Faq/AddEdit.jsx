@@ -96,10 +96,10 @@ const AddEdit = ({ setShowForm, setFaqs, editFaq = null }) => {
     }
   };
   return (
-    <div className="flex items-center justify-center">
+    <div className="w-full">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-2xl border border-green-100 bg-white p-8 shadow-lg"
+        className="w-full rounded-2xl border border-green-100 bg-white p-4 shadow-lg sm:p-6"
       >
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-green-700">

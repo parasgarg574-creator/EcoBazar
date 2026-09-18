@@ -282,7 +282,7 @@ const AddEdit = ({
     };
 
     return (
-        <div className="rounded-2xl border border-green-100 bg-white p-8 shadow-lg">
+        <div className="w-full rounded-2xl border border-green-100 bg-white p-4 shadow-lg sm:p-6">
             <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-green-700">
                     {isEditMode ? "Edit Staff" : "Add Staff"}

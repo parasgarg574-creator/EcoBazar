@@ -2,21 +2,20 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import React, { Suspense } from "react";
 import DashboardLayout from "./Layout/DashboardLayout";
 import ProtectedRoute from "./Common/ProtectedRoute";
+import Loader from "./Common/Loader";
 import Staff from "./Pages/Staff/index";
 import Categories from "./Pages/Category/index";
 import Product from "./Pages/Product";
 import Dashboard from "./Pages/Dashboard";
 import ContentManagement from "./Pages/Content";
 import Faq from "./Pages/Faq";
-// import Customers from "./Pages/Customer";
-
+import Details from "./Pages/Details";
 const Login = React.lazy(() => import("./Authentication/Login"));
 const Forgot = React.lazy(() => import("./Authentication/ForgotPassword"));
 const Reset = React.lazy(() => import("./Authentication/ResetPassword"));
-
 const PageFallback = () => (
   <div className="flex min-h-screen w-full items-center justify-center">
-    <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-200 border-t-green-600" />
+    <Loader label="Loading page..." size="lg" />
   </div>
 );
 function App() {
@@ -41,6 +40,7 @@ function App() {
           <Route path="products" element={<Product />} />
           <Route path="content-management" element={<ContentManagement />} />
           <Route path="faqs" element={<Faq />} />
+          <Route path="details/:resource/:id" element={<Details />} />
           {/* <Route path="customers" element={<Customers />} /> */}
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />

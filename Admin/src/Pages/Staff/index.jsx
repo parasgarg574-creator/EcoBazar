@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AddEditStaff from "./AddEdit";
 import apimethods from "../../Methods/ApiClient";
 import Table from "../../Components/Table";
@@ -6,6 +7,7 @@ import SearchFilter from "../../Components/SearchFilter";
 import permissions from "../../Methods/Permissions/script";
 import Swal from "sweetalert2";
 const Staff = () => {
+    const navigate = useNavigate();
     const [showForm, setShowForm] = useState(false);
     const [staffList, setStaffList] = useState([]);
     const [selectedStaff, setSelectedStaff] = useState(null);
@@ -46,44 +48,12 @@ const Staff = () => {
             label: "Role",
         },
     ];
-    const handleViewStaff = async (staffId) => {
-        console.log("Received staffId:", staffId);
-
+    const handleViewStaff = (staffId) => {
         if (!staffId || typeof staffId === "object") {
             console.error("Invalid staff ID:", staffId);
             return;
         }
-        try {
-            const response = await apimethods.getApi(
-                `/getSingleStaff/${staffId}`
-            );
-            console.log("Staff details:", response);
-
-            const staff =
-                response?.data?.data ||
-                response?.data ||
-                response;
-            Swal.fire({
-                title: staff?.name || "Staff Details",
-                html: `
-                    <div style="text-align:left">
-                        <p><strong>Name:</strong> ${staff?.name || "-"}</p>
-                        <p><strong>Email:</strong> ${staff?.email || "-"}</p>
-                        <p><strong>Role:</strong> ${staff?.role || "-"}</p>
-                    </div>
-                `,
-                confirmButtonColor: "#00491B",
-            });
-        } catch (error) {
-            console.error("Failed to get staff:", error);
-            Swal.fire({
-                title: "Failed to Get Staff",
-                text:
-                    error?.response?.data?.message ||
-                    "Something went wrong",
-                icon: "error",
-            });
-        }
+        navigate(`/dashboard/details/staff/${staffId}`);
     };
     const handleEditStaff = async (staffId) => {
         console.log("Edit staff with ID:", staffId);

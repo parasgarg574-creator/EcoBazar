@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import apimethods from "../../Methods/ApiClient";
 import permissions from "../../Methods/Permissions/script";
 import Swal from "sweetalert2";
+import Loader from "../../Common/Loader";
 const PAGES = [
   { key: "terms-and-conditions", label: "Terms & Conditions" },
   { key: "privacy-policy", label: "Privacy Policy" },
@@ -106,11 +107,11 @@ const ContentManagement = () => {
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading...</p>
+        <Loader label="Loading content..." />
       ) : isEditing ? (
         <form
           onSubmit={handleSubmit}
-          className="max-w-2xl rounded-2xl border border-green-100 bg-white p-8 shadow-lg"
+          className="w-full rounded-2xl border border-green-100 bg-white p-4 shadow-lg sm:p-6"
         >
           <div className="mb-4">
             <label
@@ -188,7 +189,7 @@ const ContentManagement = () => {
           </div>
         </form>
       ) : (
-        <div className="max-w-2xl rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="w-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-gray-800">

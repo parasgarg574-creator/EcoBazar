@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Navbar from "../../Component/Navbar";
 import Breadcrumb from "../../Component/Breadcrumb";
 import ProductCard from "../../Component/ProductCard";
+import Footer from "../../Component/Footer";
 import apimethods from "../../Methods/ApiClient";
 import { useShop } from "../../Context/ShopContext";
 import {
@@ -414,21 +415,7 @@ const ProductDetail = () => {
 
             </main>
 
-            {/* Footer */}
-            <footer className="mt-auto border-t border-gray-200 bg-white py-8">
-                <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-                        <img src="/Logo (1).png" alt="EcoBazar" className="h-8 w-auto object-contain" />
-                        <p className="text-xs text-gray-400">
-                            © 2026 EcoBazar. All rights reserved.
-                        </p>
-                        <div className="flex gap-4 text-xs text-gray-400">
-                            <a href="#" className="hover:text-green-600 transition-colors">Privacy</a>
-                            <a href="#" className="hover:text-green-600 transition-colors">Terms</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

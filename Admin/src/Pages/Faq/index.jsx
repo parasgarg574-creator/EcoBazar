@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AddEditFaq from "./AddEdit";
 import apimethods from "../../Methods/ApiClient";
 import Table from "../../Components/Table";
@@ -7,6 +8,7 @@ import permissions from "../../Methods/Permissions/script";
 import Swal from "sweetalert2";
 
 const Faq = () => {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [faqs, setFaqs] = useState([]);
   const [selectedFaq, setSelectedFaq] = useState(null);
@@ -61,34 +63,12 @@ const Faq = () => {
     },
   ];
 
-  const handleViewFaq = async (faqId) => {
+  const handleViewFaq = (faqId) => {
     if (!faqId || typeof faqId === "object") {
       console.error("Invalid FAQ ID:", faqId);
       return;
     }
-    try {
-      const response = await apimethods.getApi(`/getSingleFaq/${faqId}`);
-      const faq = response?.data?.data || response?.data || response;
-      Swal.fire({
-        title: faq?.question || "FAQ Details",
-        html: `
-          <div style="text-align:left">
-            <p><strong>Answer:</strong> ${faq?.answer || "-"}</p>
-            <p style="margin-top:8px"><strong>Status:</strong> ${
-              faq?.status || "-"
-            }</p>
-          </div>
-        `,
-        confirmButtonColor: "#00491B",
-      });
-    } catch (error) {
-      console.error("Failed to get FAQ:", error);
-      Swal.fire({
-        title: "Failed to Get FAQ",
-        text: error?.response?.data?.message || "Something went wrong",
-        icon: "error",
-      });
-    }
+    navigate(`/dashboard/details/faqs/${faqId}`);
   };
 
   const handleEditFaq = async (faqId) => {

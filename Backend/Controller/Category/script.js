@@ -1,6 +1,5 @@
 const { default: mongoose } = require("mongoose");
 const Category = require("../../Modles/Category/script");
-const Product = require("../../Modles/Product/script")
 const createCategory = async (req, res) => {
     try {
         const { name, description, ispopular } = req.body;
@@ -83,45 +82,9 @@ const getSingleCategory = async (req, res) => {
                 message: "category not found"
             })
         }
-        const { search = "", minprice, maxprie, page = 1, limit = 10, sort = "createdAt", order = "desc" } = req.query;
-        const pageNumber = Number(page);
-        const limitNumber = Number(limit);
-        const matchStage = {};
-        if (search) {
-            matchStage.name = { $regex: search, $options: "i" };
-        }
-        if (minprice || maxprie) {
-            matchStage.price = {};
-            if (minprice) {
-                matchStage.price.$gte = Number(minprice);
-            }
-            if (maxprie) {
-                matchStage.price.$lte = Number(maxprie);
-            }
-        }
-        const sortOrder = order === "asc" ? 1 : -1;
-        const products = await Product.aggregate([
-            {
-                $match: {
-                    ...matchStage,
-                    categoryID: new mongoose.Types.ObjectId(id)
-                }
-            },
-            {
-                $sort: {
-                    [sort]: sortOrder
-                }
-            },
-            {
-                $skip: (pageNumber - 1) * limitNumber
-            },
-            {
-                $limit: limitNumber
-            }
-        ]);
         res.status(200).json({
             success: true,
-            data: products
+            data: category
         });
     } catch (error) {
         res.status(500).json({
@@ -142,7 +105,6 @@ const updateCategory = async (req, res) => {
                 message: "Category not found"
             });
         }
-
         category.name = name || category.name;
         category.description =
             description !== undefined ? description : category.description;

@@ -1,7 +1,6 @@
 import { useShop } from "../../Context/ShopContext";
 import { FiX, FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
-
 const CartDrawer = () => {
     const {
         cart,
@@ -13,20 +12,15 @@ const CartDrawer = () => {
         updateCartQuantity,
         clearCart,
     } = useShop();
-
     if (!isCartOpen) return null;
-
     return (
         <div className="fixed inset-0 z-[100] overflow-hidden">
-            {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
                 onClick={closeCart}
             />
-
             <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
                 <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
-                    {/* Header */}
                     <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
                         <div className="flex items-center gap-2">
                             <FiShoppingBag className="text-green-600" size={20} />
@@ -41,8 +35,6 @@ const CartDrawer = () => {
                             <FiX size={20} />
                         </button>
                     </div>
-
-                    {/* Cart Items */}
                     <div className="flex-1 overflow-y-auto px-6 py-4">
                         {cart.length === 0 ? (
                             <div className="flex h-full flex-col items-center justify-center text-center">
@@ -65,10 +57,8 @@ const CartDrawer = () => {
                                 {cart.map(({ product, quantity }) => {
                                     const price = Number(product.price) || 0;
                                     const stock = Number(product.stock) || 999;
-
                                     return (
                                         <div key={product._id} className="flex gap-4 py-4">
-                                            {/* Image */}
                                             <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2">
                                                 <img
                                                     src={product.image || ""}
@@ -79,8 +69,6 @@ const CartDrawer = () => {
                                                     }}
                                                 />
                                             </div>
-
-                                            {/* Details */}
                                             <div className="flex flex-1 flex-col justify-between">
                                                 <div className="flex items-start justify-between gap-2">
                                                     <h4 className="text-sm font-semibold text-gray-800 line-clamp-1">
@@ -96,7 +84,6 @@ const CartDrawer = () => {
                                                 </div>
 
                                                 <div className="flex items-center justify-between mt-2">
-                                                    {/* Quantity Controls */}
                                                     <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50/50">
                                                         <button
                                                             onClick={() => updateCartQuantity(product._id, quantity - 1)}
@@ -134,8 +121,6 @@ const CartDrawer = () => {
                             </div>
                         )}
                     </div>
-
-                    {/* Footer / Subtotal */}
                     {cart.length > 0 && (
                         <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-5 space-y-4">
                             <div className="flex items-center justify-between text-base font-bold text-gray-900">
@@ -145,7 +130,6 @@ const CartDrawer = () => {
                             <p className="text-[11px] text-gray-400">
                                 Shipping and taxes calculated at checkout.
                             </p>
-
                             <div className="flex flex-col gap-2">
                                 <Link
                                     to="/cart"
@@ -178,5 +162,4 @@ const CartDrawer = () => {
         </div>
     );
 };
-
 export default CartDrawer;

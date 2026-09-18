@@ -1,3 +1,4 @@
+import { Eye, Pencil, Trash2 } from "lucide-react";             
 const Table = ({
     columns = [],
     data = [],
@@ -26,31 +27,39 @@ const Table = ({
                           if (!showView && !showEdit && !showDelete) {
                               return <span className="text-sm text-gray-400">-</span>;
                           }
-
                           return (
-                              <div className="flex gap-2">
+                              <div className="flex items-center gap-1">
                                   {showView && (
                                       <button
+                                          type="button"
                                           onClick={() => onView(rowId)}
-                                          className="rounded bg-blue-500 px-3 py-1 text-sm text-white"
+                                          aria-label="View"
+                                          title="View"
+                                          className="rounded-md p-2 text-blue-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                       >
-                                          View
+                                          <Eye size={17} strokeWidth={2} />
                                       </button>
                                   )}
                                   {showEdit && (
                                       <button
+                                          type="button"
                                           onClick={() => onEdit(rowId)}
-                                          className="rounded bg-green-500 px-3 py-1 text-sm text-white"
-                                      >
-                                          Edit
+                                          aria-label="Edit"
+                                          title="Edit"
+                                          className="rounded-md p-2 text-green-600 transition hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                         >
+                                          <Pencil size={17} strokeWidth={2} />
                                       </button>
                                   )}
                                   {showDelete && (
                                       <button
+                                          type="button"
                                           onClick={() => onDelete(rowId)}
-                                          className="rounded bg-red-500 px-3 py-1 text-sm text-white"
+                                          aria-label="Delete"
+                                          title="Delete"
+                                          className="rounded-md p-2 text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
                                       >
-                                          Delete
+                                          <Trash2 size={17} strokeWidth={2} />
                                       </button>
                                   )}
                               </div>
@@ -62,14 +71,14 @@ const Table = ({
     ];
 
     return (
-        <div className="overflow-x-auto">
-            <table className="min-w-full overflow-hidden rounded-lg border border-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
+        <div className="w-full overflow-hidden">
+            <table className="block w-full overflow-hidden rounded-lg border border-gray-200 sm:table">
+                <thead className="hidden bg-gray-50 sm:table-header-group">
+                    <tr className="sm:table-row">
                         {allColumns.map((column) => (
                             <th
                                 key={column.key}
-                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                                className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 sm:px-6"
                             >
                                 {column.label}
                             </th>
@@ -77,20 +86,28 @@ const Table = ({
                     </tr>
                 </thead>
 
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody className="block divide-y divide-gray-200 bg-white sm:table-row-group">
                     {data.length > 0 ? (
                         data.map((item, index) => (
-                            <tr key={item?._id || item?.id || item?.email || index}>
+                            <tr
+                                key={item?._id || item?.id || item?.email || index}
+                                className="block border-b border-gray-200 last:border-b-0 sm:table-row"
+                            >
                                 {allColumns.map((column) => (
                                     <td
                                         key={column.key}
-                                        className={`whitespace-nowrap px-6 py-4 ${
+                                        className={`flex min-w-0 items-start gap-3 px-3 py-3 text-sm sm:table-cell sm:whitespace-nowrap sm:px-6 sm:py-4 ${
                                             column.className || ""
                                         }`}
                                     >
-                                        {column.render
-                                            ? column.render(item, index)
-                                            : item?.[column.key] ?? "-"}
+                                        <span className="w-24 shrink-0 text-xs font-semibold uppercase text-gray-500 sm:hidden">
+                                            {column.label}
+                                        </span>
+                                        <span className="min-w-0 flex-1 wrap-break-word sm:block">
+                                            {column.render
+                                                ? column.render(item, index)
+                                                : item?.[column.key] ?? "-"}
+                                        </span>
                                     </td>
                                 ))}
                             </tr>
@@ -99,7 +116,7 @@ const Table = ({
                         <tr>
                             <td
                                 colSpan={allColumns.length}
-                                className="px-6 py-8 text-center text-gray-500"
+                                className="block px-3 py-8 text-center text-gray-500 sm:table-cell sm:px-6"
                             >
                                 {emptyMessage}
                             </td>

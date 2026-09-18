@@ -143,7 +143,6 @@ export const ShopProvider = ({ children }) => {
     const cartCount = useMemo(() => {
         return cart.reduce((total, item) => total + item.quantity, 0);
     }, [cart]);
-
     const cartSubtotal = useMemo(() => {
         return cart.reduce((total, item) => {
             const price = Number(item.product?.price) || 0;
@@ -222,5 +221,4 @@ export const useShop = () => {
     }
     return context;
 };
-
 export default ShopContext;

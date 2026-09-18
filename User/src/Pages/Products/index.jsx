@@ -15,9 +15,7 @@ const SORT_OPTIONS = [
     { value: "price:desc", label: "Price: High → Low" },
     { value: "name:asc", label: "Name: A → Z" },
 ];
-
 const PAGE_SIZE = 12;
-
 // ── FilterPanel extracted outside Products to avoid "component created during render" lint error ──
 const FilterPanel = ({
     categories,
@@ -35,17 +33,17 @@ const FilterPanel = ({
 }) => (
     <aside className="flex flex-col gap-6">
         {/* Search */}
-        <div>
-            <h3 className="text-sm font-semibold text-gray-800 mb-3">Search</h3>
-            <input
+        {/* <div> */}
+            {/* <h3 className="text-sm font-semibold text-gray-800 mb-3">Search</h3> */}
+            {/* <input
                 type="text"
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && onApply()}
                 placeholder="Search products..."
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-100 outline-none"
-            />
-        </div>
+            /> */}
+        {/* </div> */}
 
         {/* Categories */}
         {categories.length > 0 && (
@@ -323,7 +321,6 @@ const Products = () => {
                                 )}
                             </div>
                         )}
-
                         {/* Products grid */}
                         {!loading && !error && products.length > 0 && (
                             <>
@@ -332,7 +329,6 @@ const Products = () => {
                                         <ProductCard key={product._id} product={product} />
                                     ))}
                                 </div>
-
                                 {/* Pagination */}
                                 {totalPages > 1 && (
                                     <div className="mt-10 flex items-center justify-center gap-2">
@@ -343,7 +339,6 @@ const Products = () => {
                                         >
                                             <FiChevronLeft size={16} />
                                         </button>
-
                                         {Array.from({ length: totalPages }, (_, i) => i + 1)
                                             .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
                                             .reduce((acc, p, i, arr) => {
@@ -407,5 +402,4 @@ const Products = () => {
         </div>
     );
 };
-
 export default Products;

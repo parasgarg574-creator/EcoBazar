@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 const ImageUpload = ({
   value = null,
@@ -12,6 +12,22 @@ const ImageUpload = ({
 }) => {
   const inputRef = useRef(null);
   const [preview, setPreview] = useState(value)
+  const [showRequiredError, setShowRequiredError] = useState(false);
+
+  useEffect(() => {
+    const form = inputRef.current?.form;
+    if (!form) return undefined;
+
+    const handleSubmit = () => {
+      if (required && !preview) {
+        setShowRequiredError(true);
+      }
+    };
+
+    form.addEventListener("submit", handleSubmit);
+    return () => form.removeEventListener("submit", handleSubmit);
+  }, [preview, required]);
+
   useEffect(() => {
     setPreview((prev) => {
       const hasLocalSelection = multiple
@@ -34,6 +50,7 @@ const ImageUpload = ({
       }));
 
       setPreview((prev) => [...(prev || []), ...newImages]);
+      setShowRequiredError(false);
       onChange?.([...files]);
     } else {
       const file = files[0];
@@ -44,6 +61,7 @@ const ImageUpload = ({
       };
 
       setPreview(image);
+      setShowRequiredError(false);
       onChange?.(file);
     }
 
@@ -55,9 +73,11 @@ const ImageUpload = ({
       const updatedImages = preview.filter((_, i) => i !== index);
 
       setPreview(updatedImages);
+      setShowRequiredError(required && updatedImages.length === 0);
       onChange?.(updatedImages.map((item) => item.file));
     } else {
       setPreview(null);
+      setShowRequiredError(required);
       onChange?.(null);
     }
   };
@@ -132,7 +152,7 @@ const ImageUpload = ({
       )}
 
       {/* Required Error */}
-      {required && !preview && (
+      {required && !preview && showRequiredError && (
         <div className="text-red-500 text-sm mt-1">
           {error || "Image is required"}
         </div>

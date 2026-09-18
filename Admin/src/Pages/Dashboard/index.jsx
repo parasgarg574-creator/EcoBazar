@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiBox, FiGrid, FiUsers } from "react-icons/fi";
 import apimethods from "../../Methods/ApiClient";
-
 const StatCard = ({ icon, label, value, color }) => (
   <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
     <div
@@ -15,7 +14,6 @@ const StatCard = ({ icon, label, value, color }) => (
     </div>
   </div>
 );
-
 const Dashboard = () => {
   const [counts, setCounts] = useState({
     products: 0,
@@ -23,7 +21,6 @@ const Dashboard = () => {
     staff: 0,
   });
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadCounts = async () => {
       try {
@@ -51,16 +48,13 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
-
     loadCounts();
   }, []);
-
   return (
     <div>
       <h1 className="mb-6 text-xl font-semibold text-[#333] sm:text-[22px]">
         Dashboard
       </h1>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           icon={<FiBox className="text-white" size={22} />}
