@@ -16,16 +16,18 @@ import {
 import apimethods from "../../Methods/ApiClient";
 import { useShop } from "../../Context/ShopContext";
 import { useAuth } from "../../Context/AuthContext";
+import debounce from 'lodash.debounce'
 import CartDrawer from "../CartDrawer";
 
 const LOCATION_STORAGE_KEY = "ecobazar_user_location";
 
 const Navbar = () => {
     const [mobileMenu, setMobileMenu] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [ searchQuery, setSearchQuery] = useState("");
     const [categories, setCategories] = useState([]);
     const [showCategories, setShowCategories] = useState(false);
     const categoryDropdownRef = useRef(null);
+    const debouncedSearchRef = useRef(null);
     const navigate = useNavigate();
 
     const { wishlistCount, cartCount, openCart, setToastMessage } = useShop();
@@ -69,12 +71,13 @@ const Navbar = () => {
 
                     const formattedLocation = [city, state, country].filter(Boolean).join(", ");
                     const finalLoc = formattedLocation || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
-
                     setUserLocation(finalLoc);
                     localStorage.setItem(LOCATION_STORAGE_KEY, finalLoc);
                     setLocationStatus("Location updated successfully!");
                     setToastMessage?.(`Location set to: ${finalLoc} 📍`);
                     setTimeout(() => setShowLocationModal(false), 800);
+                    console.log("latitude",latitude)
+                    console.log("longitude",longitude)
                 } catch {
                     // Fallback using OpenStreetMap Nominatim
                     try {
@@ -116,12 +119,33 @@ const Navbar = () => {
         );
     };
 
-    // Auto-detect location on initial load if not previously set
+    // Auto-detect location on initial load if not previously set, and listen for dynamic location updates
     useEffect(() => {
+        const handleLocationEvent = (e) => {
+            if (e?.detail) {
+                setUserLocation(e.detail);
+            } else {
+                try {
+                    const saved = localStorage.getItem(LOCATION_STORAGE_KEY);
+                    if (saved) setUserLocation(saved);
+                } catch {
+                    // ignore
+                }
+            }
+        };
+
+        window.addEventListener("locationUpdated", handleLocationEvent);
+        window.addEventListener("storage", handleLocationEvent);
+
         const saved = localStorage.getItem(LOCATION_STORAGE_KEY);
         if (!saved && navigator.geolocation) {
             detectUserLocation();
         }
+
+        return () => {
+            window.removeEventListener("locationUpdated", handleLocationEvent);
+            window.removeEventListener("storage", handleLocationEvent);
+        };
     }, []);
 
     const handleSaveCustomLocation = (e) => {
@@ -130,20 +154,17 @@ const Navbar = () => {
             const loc = customLocationInput.trim();
             setUserLocation(loc);
             localStorage.setItem(LOCATION_STORAGE_KEY, loc);
+            window.dispatchEvent(new CustomEvent("locationUpdated", { detail: loc }));
             setCustomLocationInput("");
             setShowLocationModal(false);
             setToastMessage?.(`Location set to: ${loc} 📍`);
         }
     };
-
-    // Fetch categories for dropdown
     useEffect(() => {
         apimethods.getApi("/getcategory")
             .then((res) => setCategories(res.data.data || []))
             .catch(() => setCategories([]));
     }, []);
-
-    // Close category dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target)) {
@@ -154,8 +175,24 @@ const Navbar = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        debouncedSearchRef.current = debounce((query) => {
+            const trimmedQuery = query.trim();
+            if (trimmedQuery) {
+                navigate(`/products?search=${encodeURIComponent(trimmedQuery)}`);
+                setMobileMenu(false);
+            }
+        }, 400);
+        return () => debouncedSearchRef.current?.cancel();
+    }, [navigate]);
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        debouncedSearchRef.current?.(query);
+    };
     const handleSearch = (e) => {
         e.preventDefault();
+        debouncedSearchRef.current?.cancel();
         if (searchQuery.trim()) {
             navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
             setMobileMenu(false);
@@ -175,7 +212,6 @@ const Navbar = () => {
     return (
         <>
             <header className="w-full bg-white sticky top-0 z-50 shadow-sm">
-                {/* ── Top Bar with Location Section ──────────────────────── */}
                 <div className="border-b border-gray-100 bg-[#F7F8F9] text-xs text-[#666666]">
                     <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8 py-2">
                         {/* Location Section */}
@@ -245,7 +281,7 @@ const Navbar = () => {
                                             type="text"
                                             id="navbar-search"
                                             value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            onChange={handleSearchChange}
                                             placeholder="Search products..."
                                             className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400 text-gray-800"
                                         />
@@ -475,7 +511,7 @@ const Navbar = () => {
                                     <input
                                         type="text"
                                         value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onChange={handleSearchChange}
                                         placeholder="Search products..."
                                         className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
                                     />

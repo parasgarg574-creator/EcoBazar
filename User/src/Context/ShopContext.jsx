@@ -1,40 +1,21 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    addToCart as addToCartAction,
+    addToWishlist as addToWishlistAction,
+    clearCart as clearCartAction,
+    removeFromCart as removeFromCartAction,
+    removeFromWishlist as removeFromWishlistAction,
+    updateCartQuantity as updateCartQuantityAction,
+} from "../store/shopSlice";
+
 const ShopContext = createContext(null);
-const WISHLIST_STORAGE_KEY = "ecobazar_wishlist";
-const CART_STORAGE_KEY = "ecobazar_cart";
+
 export const ShopProvider = ({ children }) => {
-    const [wishlist, setWishlist] = useState(() => {
-        try {
-            const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [];
-        } catch {
-            return [];
-        }
-    });
-    const [cart, setCart] = useState(() => {
-        try {
-            const saved = localStorage.getItem(CART_STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [];
-        } catch {
-            return [];
-        }
-    });
+    const dispatch = useDispatch();
+    const { wishlist, cart } = useSelector((state) => state.shop);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [toastMessage, setToastMessage] = useState(null);
-    useEffect(() => {
-        try {
-            localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
-        } catch (e) {
-            console.error("Failed to persist wishlist", e);
-        }
-    }, [wishlist]);
-    useEffect(() => {
-        try {
-            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-        } catch (e) {
-            console.error("Failed to persist cart", e);
-        }
-    }, [cart]);
     const showToast = (message) => {
         setToastMessage(message);
         setTimeout(() => {
@@ -47,23 +28,17 @@ export const ShopProvider = ({ children }) => {
     };
     const addToWishlist = (product) => {
         if (!product || !product._id) return;
-        setWishlist((prev) => {
-            if (prev.some((item) => item._id === product._id)) {
-                return prev;
-            }
-            showToast(`Added "${product.name || 'Product'}" to your Wishlist ❤️`);
-            return [...prev, product];
-        });
+        if (wishlist.some((item) => item._id === product._id)) return;
+        dispatch(addToWishlistAction(product));
+        showToast(`Added "${product.name || 'Product'}" to your Wishlist ❤️`);
     };
     const removeFromWishlist = (productId) => {
         if (!productId) return;
-        setWishlist((prev) => {
-            const removed = prev.find((item) => (item._id || item.id) === productId);
-            if (removed) {
-                showToast(`Removed "${removed.name || 'Product'}" from Wishlist`);
-            }
-            return prev.filter((item) => (item._id || item.id) !== productId);
-        });
+        const removed = wishlist.find((item) => (item._id || item.id) === productId);
+        dispatch(removeFromWishlistAction(productId));
+        if (removed) {
+            showToast(`Removed "${removed.name || 'Product'}" from Wishlist`);
+        }
     };
     const toggleWishlist = (product) => {
         if (!product || !product._id) return;
@@ -76,21 +51,7 @@ export const ShopProvider = ({ children }) => {
     const addToCart = (product, quantity = 1, openDrawer = true) => {
         if (!product || !product._id) return;
         const qty = Math.max(1, Number(quantity) || 1);
-        setCart((prev) => {
-            const index = prev.findIndex((item) => item.product._id === product._id);
-            if (index > -1) {
-                const updated = [...prev];
-                const newQty = updated[index].quantity + qty;
-                const stock = Number(product.stock) || 999;
-                updated[index] = {
-                    ...updated[index],
-                    quantity: Math.min(newQty, stock),
-                };
-                return updated;
-            } else {
-                return [...prev, { product, quantity: qty }];
-            }
-        });
+        dispatch(addToCartAction({ product, quantity: qty }));
         showToast(`Added ${qty} × "${product.name || 'Product'}" to Cart 🛒`);
         if (openDrawer) {
             setIsCartOpen(true);
@@ -98,30 +59,17 @@ export const ShopProvider = ({ children }) => {
     };
     const removeFromCart = (productId) => {
         if (!productId) return;
-        setCart((prev) => prev.filter((item) => item.product._id !== productId));
+        dispatch(removeFromCartAction(productId));
     };
     const updateCartQuantity = (productId, quantity) => {
         if (!productId) return;
-        const newQty = Number(quantity);
-        if (newQty <= 0) {
-            removeFromCart(productId);
-            return;
-        }
-        setCart((prev) =>
-            prev.map((item) => {
-                if (item.product._id === productId) {
-                    const stock = Number(item.product.stock) || 999;
-                    return {
-                        ...item,
-                        quantity: Math.min(newQty, stock),
-                    };
-                }
-                return item;
-            })
-        );
+        dispatch(updateCartQuantityAction({
+            productId,
+            quantity: Number(quantity),
+        }));
     };
     const clearCart = () => {
-        setCart([]);
+        dispatch(clearCartAction());
     };
     const moveWishlistToCart = (product, removeAfterAdd = false) => {
         if (!product || !product._id) return;

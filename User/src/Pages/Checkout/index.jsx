@@ -41,7 +41,6 @@ const Checkout = () => {
         setCurrentStep("confirmation");
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
-
     if (!isLoggedIn) {
         return null;
     }
@@ -156,5 +155,4 @@ const Checkout = () => {
         </div>
     );
 };
-
 export default Checkout;

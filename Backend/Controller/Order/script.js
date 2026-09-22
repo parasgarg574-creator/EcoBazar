@@ -38,6 +38,9 @@ const createorder = async (req, res) => {
       orderItems,
       shippingAddress,
       paymentMethod = "cod",
+      paymentStatus,
+      razorpayOrderId,
+      razorpayPaymentId,
     } = req.body;
 
     if (!Array.isArray(orderItems) || orderItems.length === 0) {
@@ -87,13 +90,17 @@ const createorder = async (req, res) => {
       });
     }
 
+    const statusOfPayment = paymentStatus || (paymentMethod === "cod" ? "pending" : "paid");
+
     const order = new Orders({
       userId: authUserId,
       orderItems: validatedOrderItems,
       totalAmount: calculatedTotal,
       shippingAddress,
       paymentMethod,
-      paymentStatus: paymentMethod === "cod" ? "pending" : "pending",
+      paymentStatus: statusOfPayment,
+      razorpayOrderId,
+      razorpayPaymentId,
       orderStatus: "pending",
     });
 
@@ -126,12 +133,10 @@ const getorder = async (req, res) => {
         message: "Unauthorized",
       });
     }
-
     let targetUserId = req.params.userId;
     if (!targetUserId || targetUserId === "undefined") {
       targetUserId = authUserId;
     }
-
     if (
       req.user.role !== "admin" &&
       targetUserId.toString() !== authUserId.toString()
@@ -141,18 +146,15 @@ const getorder = async (req, res) => {
         message: "Forbidden: You can only access your own orders",
       });
     }
-
     if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
       return res.status(400).json({
         success: false,
         message: "Invalid user ID format",
       });
     }
-
     const orders = await Orders.find({ userId: targetUserId })
       .populate("orderItems.productId", "name price image description")
       .sort({ createdAt: -1 });
-
     res.status(200).json({
       success: true,
       count: orders.length,
@@ -166,7 +168,6 @@ const getorder = async (req, res) => {
     });
   }
 };
-
 const getOrderById = async (req, res) => {
   try {
     const authUserId = req.user?.id || req.user?._id;
@@ -189,7 +190,6 @@ const getOrderById = async (req, res) => {
         message: "Order not found",
       });
     }
-
     if (
       req.user.role !== "admin" &&
       order.userId._id.toString() !== authUserId.toString() &&

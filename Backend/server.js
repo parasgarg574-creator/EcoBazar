@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+dotenv.config();
+console.log("Razorpay Key:", process.env.RAZORPAY_KEY_ID);
 const cors = require("cors");
 const path = require("path");
 const AdminPublicRoutes = require("./Routes/Admin/Public/script");
@@ -12,7 +14,8 @@ const ContentRoutes = require("./Routes/Content/script");
 const FaqRoutes = require("./Routes/Faq/script");
 const OrderRoutes = require("./Routes/Order/script");
 const UserRoutes = require("./Routes/User/script");
-dotenv.config();
+const ContactRoutes = require("./Routes/Contact/script");
+const PaymentRoutes = require("./Routes/Payment/script")
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -26,6 +29,8 @@ app.use("/",ContentRoutes);
 app.use("/",FaqRoutes);
 app.use("/",OrderRoutes);
 app.use("/",UserRoutes);
+app.use("/", ContactRoutes);
+app.use("/",PaymentRoutes)
 app.use(
     "/uploads",
     express.static(path.join(__dirname, "Middleware", "uploads"))

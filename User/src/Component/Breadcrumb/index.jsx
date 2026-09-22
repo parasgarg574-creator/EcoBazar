@@ -20,7 +20,7 @@ const Breadcrumb = ({ labels = {} }) => {
                 <ol className="flex items-center gap-1 py-2.5 flex-wrap">
                     <li className="flex items-center gap-1 shrink-0">
                         <Link
-                            to="/"
+                            to="/" 
                             className="flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors text-sm"
                             aria-label="Home"
                         >

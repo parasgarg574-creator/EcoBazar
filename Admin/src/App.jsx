@@ -10,6 +10,7 @@ import Dashboard from "./Pages/Dashboard";
 import ContentManagement from "./Pages/Content";
 import Faq from "./Pages/Faq";
 import Details from "./Pages/Details";
+import Settings from "./Pages/Settings";
 const Login = React.lazy(() => import("./Authentication/Login"));
 const Forgot = React.lazy(() => import("./Authentication/ForgotPassword"));
 const Reset = React.lazy(() => import("./Authentication/ResetPassword"));
@@ -40,6 +41,7 @@ function App() {
           <Route path="products" element={<Product />} />
           <Route path="content-management" element={<ContentManagement />} />
           <Route path="faqs" element={<Faq />} />
+          <Route path="settings" element={<Settings />} />
           <Route path="details/:resource/:id" element={<Details />} />
           {/* <Route path="customers" element={<Customers />} /> */}
         </Route>

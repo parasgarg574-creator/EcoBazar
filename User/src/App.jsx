@@ -13,6 +13,7 @@ import Cart from "./Pages/Cart";
 import Checkout from "./Pages/Checkout";
 import LegalContent from "./Pages/LegalContent";
 import Faq from "./Pages/Faq";
+import Contact from "./Pages/Contact";
 import { ShopProvider } from "./Context/ShopContext";
 import { AuthProvider } from "./Context/AuthContext";
 
@@ -48,6 +49,7 @@ function App() {
           <Route path="/register" element={<SignUp />} />
           <Route path="/:page" element={<LegalContent />} />
           <Route path="/faq" element={<Faq />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </ShopProvider>
     </AuthProvider>

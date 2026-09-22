@@ -13,29 +13,29 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
       end: true,
     },
     {
-      name: "Products",
-      path: "/dashboard/products",
-      key: "readProducts",
-    },
-    {
       name: "Staff",
       path: "/dashboard/staff",
       key: "readStaff",
-    },
-    {
-      name: "Orders",
-      path: "/dashboard/orders",
-      key: "readOrders",
     },
     {
       name: "Customers",
       path: "/dashboard/customers",
       key: "readCustomers",
     },
-    {
+     {
       name: "Categories",
       path: "/dashboard/categories",
       key: "readCategories",
+    },
+    {
+      name: "Products",
+      path: "/dashboard/products",
+      key: "readProducts",
+    },
+    {
+      name: "Orders",
+      path: "/dashboard/orders",
+      key: "readOrders",
     },
     {
       name: "Content-Management",
@@ -58,7 +58,6 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
   );
 
   const closeMobile = () => setMobileOpen?.(false);
-
   return (
     <>
       {mobileOpen && (
@@ -67,8 +66,7 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
           aria-hidden="true"
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
         />
-      )}
-
+      )}  
       <aside
         className={`fixed left-0 top-0 z-50 h-screen w-[280px] border-r border-gray-200 bg-white transition-transform duration-300
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -100,7 +98,7 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
           type="button"
           onClick={() => setcollapsed(!collapsed)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="absolute -right-4 top-32 hidden h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition hover:bg-gray-50 lg:flex"
+          className="absolute -right-4 top-15 hidden h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition hover:bg-gray-50 lg:flex"
         >
           <FaChevronLeft
             size={15}

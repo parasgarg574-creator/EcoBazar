@@ -130,9 +130,41 @@ const getAdminProfile = async (req, res) => {
   }
 };
 
+const getPublicContactDetails = async (req, res) => {
+  try {
+    const admin = await User.findOne({ role: "admin", isActive: true })
+      .select("name email phone address location")
+      .sort({ createdAt: 1 });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact details are not available",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        name: admin.name,
+        email: admin.email,
+        phone: admin.phone || process.env.CONTACT_PHONE || "",
+        address: admin.address || process.env.CONTACT_ADDRESS || "",
+        location: admin.location || process.env.CONTACT_LOCATION || "",
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load contact details",
+      error: error.message,
+    });
+  }
+};
+
 const updateAdmin = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, phone, address, location } = req.body;
 
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -143,6 +175,9 @@ const updateAdmin = async (req, res) => {
     }
     if (name) user.name = name;
     if (email) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (address !== undefined) user.address = address;
+    if (location !== undefined) user.location = location;
     await user.save();
     const userResponse = user.toObject();
     delete userResponse.password;
@@ -188,6 +223,7 @@ module.exports = {
   registerAdmin,
   loginAdmin,
   getAdminProfile,
+  getPublicContactDetails,
   updateAdmin,
   deleteAdmin,
 };

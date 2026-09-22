@@ -26,11 +26,7 @@ const Account = () => {
     const { user, isLoggedIn, firstLetter, login, logout } = useAuth();
     const { wishlistCount, cartCount, openCart } = useShop();
     const navigate = useNavigate();
-
-    // Tab state: "login" | "signup"
     const [activeTab, setActiveTab] = useState("login");
-
-    // Login form state
     const [loginData, setLoginData] = useState({
         email: "",
         password: "",
@@ -40,8 +36,6 @@ const Account = () => {
     const [loginErrors, setLoginErrors] = useState({});
     const [loginLoading, setLoginLoading] = useState(false);
     const [loginApiError, setLoginApiError] = useState(null);
-
-    // Signup form state
     const [signupData, setSignupData] = useState({
         name: "",
         email: "",
@@ -57,15 +51,11 @@ const Account = () => {
     const [signupSuccessMessage, setSignupSuccessMessage] = useState(null);
 
     const apiUrl = Environment.api || "http://localhost:5000";
-
-    // ── Email Regex ─────────────────────────────────────────────────────────────
     const validateEmail = (email) => {
         return String(email)
             .toLowerCase()
             .match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     };
-
-    // ── Login Validation ────────────────────────────────────────────────────────
     const validateLoginForm = () => {
         const errors = {};
         if (!loginData.email.trim()) {
@@ -83,8 +73,6 @@ const Account = () => {
         setLoginErrors(errors);
         return Object.keys(errors).length === 0;
     };
-
-    // ── Signup Validation ───────────────────────────────────────────────────────
     const validateSignupForm = () => {
         const errors = {};
         if (!signupData.name.trim()) {
@@ -92,25 +80,21 @@ const Account = () => {
         } else if (signupData.name.trim().length < 2) {
             errors.name = "Name must be at least 2 characters";
         }
-
         if (!signupData.email.trim()) {
             errors.email = "Email address is required";
         } else if (!validateEmail(signupData.email)) {
             errors.email = "Please enter a valid email address";
         }
-
         if (!signupData.password) {
             errors.password = "Password is required";
         } else if (signupData.password.length < 6) {
             errors.password = "Password must be at least 6 characters";
         }
-
         if (!signupData.confirmPassword) {
             errors.confirmPassword = "Please confirm your password";
         } else if (signupData.password !== signupData.confirmPassword) {
             errors.confirmPassword = "Passwords do not match";
         }
-
         if (!signupData.acceptTerms) {
             errors.acceptTerms = "You must agree to the Terms of Service";
         }
@@ -118,8 +102,6 @@ const Account = () => {
         setSignupErrors(errors);
         return Object.keys(errors).length === 0;
     };
-
-    // ── Handle Login ────────────────────────────────────────────────────────────
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setLoginApiError(null);
@@ -138,13 +120,11 @@ const Account = () => {
                     password: loginData.password,
                 }),
             });
-
             const data = await res.json();
 
             if (!res.ok || !data.success) {
                 throw new Error(data.message || "Failed to sign in. Please check your credentials.");
             }
-
             login(data.data, data.token);
         } catch (err) {
             setLoginApiError(err.message || "An unexpected error occurred. Please try again.");
@@ -152,15 +132,11 @@ const Account = () => {
             setLoginLoading(false);
         }
     };
-
-    // ── Handle Signup ───────────────────────────────────────────────────────────
     const handleSignupSubmit = async (e) => {
         e.preventDefault();
         setSignupApiError(null);
         setSignupSuccessMessage(null);
-
         if (!validateSignupForm()) return;
-
         setSignupLoading(true);
         try {
             const res = await fetch(`${apiUrl}/public/register`, {
@@ -174,14 +150,10 @@ const Account = () => {
                     password: signupData.password,
                 }),
             });
-
             const data = await res.json();
-
             if (!res.ok || !data.success) {
                 throw new Error(data.message || "Failed to create account. Please try again.");
             }
-
-            // Automatically attempt login right after registration
             const loginRes = await fetch(`${apiUrl}/public/login`, {
                 method: "POST",
                 headers: {
@@ -210,15 +182,21 @@ const Account = () => {
 
     const [userOrders, setUserOrders] = useState([]);
     const [ordersLoading, setOrdersLoading] = useState(false);
-
     useEffect(() => {
         if (isLoggedIn) {
             setOrdersLoading(true);
-            apimethods
-                .getApi("/getorder")
-                .then((res) => {
-                    if (res.data?.success && Array.isArray(res.data.orders)) {
-                        setUserOrders(res.data.orders);
+
+            fetch("http://localhost:5000/getorder", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data?.success && Array.isArray(data.orders)) {
+                        setUserOrders(data.orders);
                     }
                 })
                 .catch((err) => {
@@ -229,8 +207,6 @@ const Account = () => {
                 });
         }
     }, [isLoggedIn]);
-
-    // ── Logged In User Dashboard ────────────────────────────────────────────────
     if (isLoggedIn && user) {
         return (
             <div className="flex flex-col min-h-screen bg-gray-50">
@@ -431,11 +407,10 @@ const Account = () => {
                                         }
                                     }}
                                     placeholder="Email"
-                                    className={`w-full px-4 py-3 sm:py-3.5 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${
-                                        loginErrors.email
+                                    className={`w-full px-4 py-3 sm:py-3.5 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${loginErrors.email
                                             ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-200"
                                             : "border-[#E6E6E6] focus:border-[#00B207] focus:ring-1 focus:ring-[#00B207]"
-                                    }`}
+                                        }`}
                                 />
                                 {loginErrors.email && (
                                     <p className="mt-1.5 text-xs text-red-500">{loginErrors.email}</p>
@@ -455,11 +430,10 @@ const Account = () => {
                                             }
                                         }}
                                         placeholder="Password"
-                                        className={`w-full px-4 py-3 sm:py-3.5 pr-11 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${
-                                            loginErrors.password
+                                        className={`w-full px-4 py-3 sm:py-3.5 pr-11 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${loginErrors.password
                                                 ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-200"
                                                 : "border-[#E6E6E6] focus:border-[#00B207] focus:ring-1 focus:ring-[#00B207]"
-                                        }`}
+                                            }`}
                                     />
                                     <button
                                         type="button"
@@ -552,11 +526,10 @@ const Account = () => {
                                         }
                                     }}
                                     placeholder="Email"
-                                    className={`w-full px-4 py-3 sm:py-3.5 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${
-                                        signupErrors.email
+                                    className={`w-full px-4 py-3 sm:py-3.5 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${signupErrors.email
                                             ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-200"
                                             : "border-[#E6E6E6] focus:border-[#00B207] focus:ring-1 focus:ring-[#00B207]"
-                                    }`}
+                                        }`}
                                 />
                                 {signupErrors.email && (
                                     <p className="mt-1.5 text-xs text-red-500">{signupErrors.email}</p>
@@ -576,11 +549,10 @@ const Account = () => {
                                             }
                                         }}
                                         placeholder="Password"
-                                        className={`w-full px-4 py-3 sm:py-3.5 pr-11 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${
-                                            signupErrors.password
+                                        className={`w-full px-4 py-3 sm:py-3.5 pr-11 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${signupErrors.password
                                                 ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-200"
                                                 : "border-[#E6E6E6] focus:border-[#00B207] focus:ring-1 focus:ring-[#00B207]"
-                                        }`}
+                                            }`}
                                     />
                                     <button
                                         type="button"
@@ -612,11 +584,10 @@ const Account = () => {
                                             }
                                         }}
                                         placeholder="Confirm Password"
-                                        className={`w-full px-4 py-3 sm:py-3.5 pr-11 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${
-                                            signupErrors.confirmPassword
+                                        className={`w-full px-4 py-3 sm:py-3.5 pr-11 border rounded-md text-sm text-[#1A1A1A] placeholder-[#999999] outline-none transition-all bg-white ${signupErrors.confirmPassword
                                                 ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-200"
                                                 : "border-[#E6E6E6] focus:border-[#00B207] focus:ring-1 focus:ring-[#00B207]"
-                                        }`}
+                                            }`}
                                     />
                                     <button
                                         type="button"
