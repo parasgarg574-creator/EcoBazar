@@ -41,6 +41,8 @@ const createorder = async (req, res) => {
       paymentStatus,
       razorpayOrderId,
       razorpayPaymentId,
+      discountAmount = 0,
+      totalAmount,
     } = req.body;
 
     if (!Array.isArray(orderItems) || orderItems.length === 0) {
@@ -92,10 +94,15 @@ const createorder = async (req, res) => {
 
     const statusOfPayment = paymentStatus || (paymentMethod === "cod" ? "pending" : "paid");
 
+    const finalCalculatedTotal = Math.max(0, calculatedTotal - Number(discountAmount || 0));
+    const finalTotalAmount = (totalAmount !== undefined && Number(totalAmount) >= 0)
+      ? Number(totalAmount)
+      : finalCalculatedTotal;
+
     const order = new Orders({
       userId: authUserId,
       orderItems: validatedOrderItems,
-      totalAmount: calculatedTotal,
+      totalAmount: finalTotalAmount,
       shippingAddress,
       paymentMethod,
       paymentStatus: statusOfPayment,

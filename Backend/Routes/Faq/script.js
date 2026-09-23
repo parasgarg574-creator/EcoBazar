@@ -8,5 +8,4 @@ router.get("/getFaqs", authMiddleware, Faq.getFaqs);
 router.get("/getSingleFaq/:id", authMiddleware, Faq.getSingleFaq);
 router.put("/updateFaq/:id", authMiddleware, isAdmin, Faq.updateFaq);
 router.delete("/deleteFaq/:id", authMiddleware, isAdmin, Faq.deleteFaq);
-
 module.exports = router;

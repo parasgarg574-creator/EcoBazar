@@ -233,7 +233,7 @@ const Navbar = () => {
                         {/* Topbar Right Links */}
                         <div className="flex items-center gap-4 text-xs text-[#666666]">
                             {/* <span className="hidden sm:inline text-[#808080]">
-                                Free shipping on all orders over <strong className="text-[#1A1A1A]">$50</strong>
+                                Free shipping on all orders over <strong className="text-[#1A1A1A]">₹500</strong>
                             </span> */}
                             <span className="text-gray-300 hidden sm:inline">|</span>
                             {isLoggedIn ? (

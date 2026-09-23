@@ -15,7 +15,8 @@ const FaqRoutes = require("./Routes/Faq/script");
 const OrderRoutes = require("./Routes/Order/script");
 const UserRoutes = require("./Routes/User/script");
 const ContactRoutes = require("./Routes/Contact/script");
-const PaymentRoutes = require("./Routes/Payment/script")
+const PaymentRoutes = require("./Routes/Payment/script");
+const CounponRoutes = require("./Routes/Coupon/script")
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -30,7 +31,8 @@ app.use("/",FaqRoutes);
 app.use("/",OrderRoutes);
 app.use("/",UserRoutes);
 app.use("/", ContactRoutes);
-app.use("/",PaymentRoutes)
+app.use("/",PaymentRoutes);
+app.use("/",CounponRoutes)
 app.use(
     "/uploads",
     express.static(path.join(__dirname, "Middleware", "uploads"))

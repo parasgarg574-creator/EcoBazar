@@ -70,6 +70,7 @@ export const ShopProvider = ({ children }) => {
     };
     const clearCart = () => {
         dispatch(clearCartAction());
+        setAppliedCoupon(null);
     };
     const moveWishlistToCart = (product, removeAfterAdd = false) => {
         if (!product || !product._id) return;
@@ -97,6 +98,45 @@ export const ShopProvider = ({ children }) => {
             return total + price * item.quantity;
         }, 0);
     }, [cart]);
+
+    const COUPON_STORAGE_KEY = "ecobazar_applied_coupon";
+    const [appliedCoupon, setAppliedCoupon] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem(COUPON_STORAGE_KEY);
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
+
+    useEffect(() => {
+        try {
+            if (appliedCoupon) {
+                sessionStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(appliedCoupon));
+            } else {
+                sessionStorage.removeItem(COUPON_STORAGE_KEY);
+            }
+        } catch (e) {
+            console.error("Failed to persist applied coupon", e);
+        }
+    }, [appliedCoupon]);
+
+    useEffect(() => {
+        if (cart.length === 0 && appliedCoupon) {
+            setAppliedCoupon(null);
+        }
+    }, [cart, appliedCoupon]);
+
+    const discountAmount = useMemo(() => {
+        if (!appliedCoupon) return 0;
+        return Number(appliedCoupon.discountAmount) || 0;
+    }, [appliedCoupon]);
+
+    const finalTotal = useMemo(() => {
+        if (!appliedCoupon) return cartSubtotal;
+        return Math.max(0, cartSubtotal - (Number(appliedCoupon.discountAmount) || 0));
+    }, [cartSubtotal, appliedCoupon]);
+
     const wishlistCount = wishlist.length;
     const SHIPPING_STORAGE_KEY = "ecobazar_shipping";
     const [shippingAddress, setShippingAddress] = useState(() => {
@@ -132,6 +172,10 @@ export const ShopProvider = ({ children }) => {
         cart,
         cartCount,
         cartSubtotal,
+        appliedCoupon,
+        setAppliedCoupon,
+        discountAmount,
+        finalTotal,
         isCartOpen,
         setIsCartOpen,
         openCart: () => setIsCartOpen(true),

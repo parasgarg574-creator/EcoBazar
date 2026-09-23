@@ -114,11 +114,11 @@ const Wishlist = () => {
                                                     <td className="py-4 px-6">
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-sm sm:text-base font-bold text-[#1A1A1A]">
-                                                                ${price.toFixed(2)}
+                                                                ₹{price.toFixed(2)}
                                                             </span>
                                                             {originalPrice && (
                                                                 <span className="text-xs sm:text-sm text-[#999999] line-through">
-                                                                    ${originalPrice}
+                                                                    ₹{originalPrice}
                                                                 </span>
                                                             )}
                                                         </div>

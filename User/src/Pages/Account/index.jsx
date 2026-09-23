@@ -182,6 +182,7 @@ const Account = () => {
 
     const [userOrders, setUserOrders] = useState([]);
     const [ordersLoading, setOrdersLoading] = useState(false);
+    const token = localStorage.getItem("token")
     useEffect(() => {
         if (isLoggedIn) {
             setOrdersLoading(true);
@@ -190,8 +191,9 @@ const Account = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                     Authorization: `Bearer ${token}`
                 },
-                credentials: "include",
+                // credentials: "include"
             })
                 .then((res) => res.json())
                 .then((data) => {
@@ -215,11 +217,9 @@ const Account = () => {
 
                 <main className="flex-1 w-full py-10">
                     <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
-                        {/* Profile Card */}
                         <div className="rounded-3xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm">
                             <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 pb-6 border-b border-gray-100 text-center sm:text-left">
                                 <div className="flex flex-col sm:flex-row items-center gap-5">
-                                    {/* Avatar with First Letter */}
                                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-green-600 to-emerald-500 text-3xl font-extrabold text-white shadow-lg shadow-green-200">
                                         {firstLetter || "U"}
                                     </div>
@@ -248,10 +248,7 @@ const Account = () => {
                                     <span>Sign Out</span>
                                 </button>
                             </div>
-
-                            {/* Quick Stats Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
-                                {/* Wishlist Card */}
                                 <div
                                     onClick={() => navigate("/wishlist")}
                                     className="group flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50/50 p-5 cursor-pointer transition hover:border-green-300 hover:bg-white hover:shadow-md"
@@ -272,8 +269,6 @@ const Account = () => {
                                         className="text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all"
                                     />
                                 </div>
-
-                                {/* Cart Card */}
                                 <div
                                     onClick={openCart}
                                     className="group flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50/50 p-5 cursor-pointer transition hover:border-green-300 hover:bg-white hover:shadow-md"
@@ -296,8 +291,6 @@ const Account = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Recent Orders Section */}
                         <div className="rounded-3xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm space-y-4">
                             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                 <FiPackage className="text-[#00B207]" />
@@ -327,7 +320,7 @@ const Account = () => {
                                                     {ord.paymentStatus}
                                                 </span>
                                                 <span className="font-bold text-gray-900">
-                                                    ${Number(ord.totalAmount || 0).toFixed(2)}
+                                                    ₹{Number(ord.totalAmount || 0).toFixed(2)}
                                                 </span>
                                             </div>
                                         </div>

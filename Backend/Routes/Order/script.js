@@ -12,7 +12,7 @@ const {
 
 router.post("/createorder", authMiddleware, createorder);
 router.post("/order/checkout", authMiddleware, createorder);
-router.get("/getorder", getorder);
+router.get("/getorder", authMiddleware, getorder);
 router.get("/getorder/:userId", authMiddleware, getorder);
 router.get("/order/detail/:id", authMiddleware, getOrderById);
 router.put("/updateorder/:id", authMiddleware, updateorder);

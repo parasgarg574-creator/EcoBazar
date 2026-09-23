@@ -16,13 +16,15 @@ const Cart = () => {
         removeFromCart,
         updateCartQuantity,
         setToastMessage,
+        appliedCoupon,
+        setAppliedCoupon,
+        discountAmount,
+        finalTotal,
     } = useShop();
     const { isLoggedIn } = useAuth();
     const navigate = useNavigate();
-
     const [couponCode, setCouponCode] = useState("");
-    const [appliedCoupon, setAppliedCoupon] = useState(null);
-    const [couponError, setCouponError] = useState("");         
+    const [couponError, setCouponError] = useState("");
     const handleProceed = () => {
         if (!cart || cart.length === 0) {
             setToastMessage?.("Your cart is empty! Add products before checking out.");
@@ -36,28 +38,49 @@ const Cart = () => {
         }
         navigate("/checkout");
     };
-    const handleApplyCoupon = (e) => {
+    const handleApplyCoupon = async (e) => {
         e.preventDefault();
         setCouponError("");
-        const code = couponCode.trim().toUpperCase();
-        if (!code) {
-            setCouponError("Please enter a coupon code");
+        if (!couponCode.trim()) {
+            setCouponError("Please enter a coupon code.");
             return;
         }
-        if (code === "SAVE10" || code === "ECO10") {
-            setAppliedCoupon({ code, discountPercent: 10 });
-            setToastMessage?.("10% discount applied to your cart! 🎉");
-        } else if (code === "FREESHIP") {
-            setAppliedCoupon({ code, discountPercent: 5 });
-            setToastMessage?.("Special coupon applied! 🎉");
-        } else {
-            setCouponError("Invalid coupon code. Try ECO10 for 10% off.");
+        try {
+            const response = await fetch("http://localhost:5000/verifyCoupon", {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    code: couponCode.trim(),
+                    orderAmount: Number(cartSubtotal)
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setAppliedCoupon(null);
+                setCouponError(data.message || "Invalid coupon code.");
+                return;
+            }
+            setAppliedCoupon({
+                couponCode: data.data.couponCode,
+                discountAmount: data.data.discount,
+                finalAmount: data.data.finalAmount
+            });
+            setToastMessage?.(`Coupon "${data.data.couponCode}" applied successfully!`);
+        } catch (err) {
+            console.error("Coupon verification error:", err);
+            setAppliedCoupon(null);
+            setCouponError("Unable to verify coupon. Please try again.");
         }
     };
-    const discountAmount = appliedCoupon
-        ? (cartSubtotal * appliedCoupon.discountPercent) / 100
-        : 0;
-    const finalTotal = Math.max(0, cartSubtotal - discountAmount);
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode("");
+        setCouponError("");
+        setToastMessage?.("Coupon removed.");
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-[#F7F8F9]">
             {/* Dynamic Navbar */}
@@ -152,7 +175,7 @@ const Cart = () => {
                                                             {/* Price */}
                                                             <td className="py-4 px-4">
                                                                 <span className="text-sm sm:text-base font-normal text-[#1A1A1A]">
-                                                                    ${price.toFixed(2)}
+                                                                    ₹{price.toFixed(2)}
                                                                 </span>
                                                             </td>
 
@@ -195,7 +218,7 @@ const Cart = () => {
                                                             {/* Subtotal */}
                                                             <td className="py-4 px-4">
                                                                 <span className="text-sm sm:text-base font-bold text-[#1A1A1A]">
-                                                                    ${itemSubtotal.toFixed(2)}
+                                                                    ₹{itemSubtotal.toFixed(2)}
                                                                 </span>
                                                             </td>
 
@@ -246,29 +269,44 @@ const Cart = () => {
                                         Coupon Code
                                     </h3>
 
-                                    <form
-                                        onSubmit={handleApplyCoupon}
-                                        className="flex flex-col sm:flex-row items-center gap-3 w-full md:max-w-md"
-                                    >
-                                        <div className="w-full relative">
-                                            <input
-                                                type="text"
-                                                value={couponCode}
-                                                onChange={(e) => {
-                                                    setCouponCode(e.target.value);
-                                                    if (couponError) setCouponError("");
-                                                }}
-                                                placeholder="Enter code"
-                                                className="w-full px-5 py-3 border border-[#E6E6E6] rounded-full text-sm text-[#1A1A1A] placeholder-[#999999] outline-none focus:border-[#00B207] transition bg-white"
-                                            />
+                                    {appliedCoupon ? (
+                                        <div className="flex items-center gap-3 bg-green-50 border border-green-200 px-4 py-2.5 rounded-full">
+                                            <span className="text-sm font-semibold text-[#00B207]">
+                                                {appliedCoupon.couponCode} applied (-₹{Number(appliedCoupon.discountAmount).toFixed(2)})
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveCoupon}
+                                                className="text-xs font-semibold text-red-600 hover:text-red-800 underline cursor-pointer"
+                                            >
+                                                Remove
+                                            </button>
                                         </div>
-                                        <button
-                                            type="submit"
-                                            className="w-full sm:w-auto shrink-0 px-7 sm:px-8 py-3.5 bg-[#333333] hover:bg-[#1A1A1A] text-white font-semibold text-xs sm:text-sm rounded-full transition shadow-sm cursor-pointer whitespace-nowrap"
+                                    ) : (
+                                        <form
+                                            onSubmit={handleApplyCoupon}
+                                            className="flex flex-col sm:flex-row items-center gap-3 w-full md:max-w-md"
                                         >
-                                            Apply Coupon
-                                        </button>
-                                    </form>
+                                            <div className="w-full relative">
+                                                <input
+                                                    type="text"
+                                                    value={couponCode}
+                                                    onChange={(e) => {
+                                                        setCouponCode(e.target.value);
+                                                        if (couponError) setCouponError("");
+                                                    }}
+                                                    placeholder="Enter code"
+                                                    className="w-full px-5 py-3 border border-[#E6E6E6] rounded-full text-sm text-[#1A1A1A] placeholder-[#999999] outline-none focus:border-[#00B207] transition bg-white"
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                className="w-full sm:w-auto shrink-0 px-7 sm:px-8 py-3.5 bg-[#333333] hover:bg-[#1A1A1A] text-white font-semibold text-xs sm:text-sm rounded-full transition shadow-sm cursor-pointer whitespace-nowrap"
+                                            >
+                                                Apply Coupon
+                                            </button>
+                                        </form>
+                                    )}
                                 </div>
                                 {couponError && (
                                     <p className="text-xs text-red-500 pl-2">{couponError}</p>
@@ -286,7 +324,7 @@ const Cart = () => {
                                     <div className="flex items-center justify-between py-3 border-b border-[#E6E6E6] text-sm text-[#4D4D4D]">
                                         <span>Subtotal:</span>
                                         <span className="font-semibold text-[#1A1A1A]">
-                                            ${cartSubtotal.toFixed(2)}
+                                            ₹{cartSubtotal.toFixed(2)}
                                         </span>
                                     </div>
 
@@ -299,18 +337,20 @@ const Cart = () => {
                                     {/* Coupon Discount (if applied) */}
                                     {appliedCoupon && (
                                         <div className="flex items-center justify-between py-3 border-b border-[#E6E6E6] text-sm text-[#00B207]">
-                                            <span>Discount ({appliedCoupon.discountPercent}%):</span>
+                                            <span>
+                                                Discount:
+                                            </span>
+
                                             <span className="font-semibold">
-                                                -${discountAmount.toFixed(2)}
+                                                -₹{Number(appliedCoupon.discountAmount).toFixed(2)}
                                             </span>
                                         </div>
                                     )}
-
                                     {/* Total */}
                                     <div className="flex items-center justify-between py-3 text-base font-normal text-[#1A1A1A]">
                                         <span className="text-sm text-[#4D4D4D]">Total:</span>
                                         <span className="text-lg font-bold text-[#1A1A1A]">
-                                            ${finalTotal.toFixed(2)}
+                                            ₹{finalTotal.toFixed(2)}
                                         </span>
                                     </div>
 
@@ -318,7 +358,7 @@ const Cart = () => {
                                     <button
                                         type="button"
                                         onClick={handleProceed
-                                            
+
                                         }
                                         className="w-full py-3.5 bg-[#00B207] hover:bg-[#009e06] text-white font-semibold text-sm rounded-full transition-colors shadow-sm flex items-center justify-center cursor-pointer mt-4"
                                     >
@@ -333,5 +373,4 @@ const Cart = () => {
         </div>
     );
 };
-
 export default Cart;

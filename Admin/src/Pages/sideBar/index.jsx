@@ -43,6 +43,11 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
       key: "readContent",
     },
     {
+      name:"Coupon",
+      path:"/dashboard/coupon",
+      key:"createCoupon"
+    },
+    {
       name: "FAQs",
       path: "/dashboard/faqs",
       key: "readFaqs",
@@ -56,7 +61,6 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
   const filteredMenuItems = menuitems.filter((item) =>
     permissions.isAllowed(item.key)
   );
-
   const closeMobile = () => setMobileOpen?.(false);
   return (
     <>
@@ -77,23 +81,12 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
             collapsed ? "px-4 lg:justify-center" : "px-6 lg:px-8"
           }`}
         >
-          <img
-            src="/Logo.svg"
-            alt="Logo"
-            width={34}
-            height={34}
-            className="h-[34px] w-auto object-contain"
-          />
-          <button
-            type="button"
-            onClick={closeMobile}
-            aria-label="Close menu"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden"
+          <img src="/Logo.svg" alt="Logo" width={34} height={34} className="h-[34px] w-auto object-contain"/>
+          <button type="button" onClick={closeMobile} aria-label="Close menu" className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden"
           >
             <FiX size={20} />
           </button>
         </div>
-
         <button
           type="button"
           onClick={() => setcollapsed(!collapsed)}
@@ -107,7 +100,6 @@ const SideBar = ({ collapsed, setcollapsed, mobileOpen, setMobileOpen }) => {
             }`}
           />
         </button>
-
         <nav className="space-y-2 overflow-y-auto p-4 sm:p-5">
           {filteredMenuItems.map((item) => (
             <NavLink

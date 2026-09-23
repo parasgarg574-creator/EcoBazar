@@ -9,13 +9,7 @@ import {
 } from "react-icons/fi";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const PaymentStep = ({ onBack, onSuccess }) => {
-    const {
-        cart,
-        cartSubtotal,
-        shippingAddress,
-        clearCart,
-        setToastMessage,
-    } = useShop();
+    const { cart, cartSubtotal, appliedCoupon, discountAmount, finalTotal, shippingAddress, clearCart, setToastMessage } = useShop();
     const [paymentMethod, setPaymentMethod] = useState("cod");
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     const [apiError, setApiError] = useState("");
@@ -31,7 +25,6 @@ const PaymentStep = ({ onBack, onSuccess }) => {
             script.onerror = () => resolve(false);
             document.body.appendChild(script);
         });
-
     const postJSON = async (endpoint, body) => {
         const token = localStorage.getItem("token");
         const headers = { "Content-Type": "application/json" };
@@ -59,7 +52,6 @@ const PaymentStep = ({ onBack, onSuccess }) => {
         setToastMessage?.("Order placed successfully!");
         onSuccess?.(order);
     };
-
     const handlePlaceOrder = async (e) => {
         e.preventDefault();
         setApiError("");
@@ -75,7 +67,6 @@ const PaymentStep = ({ onBack, onSuccess }) => {
         }
 
         setIsPlacingOrder(true);
-
         const orderItems = cart.map((item) => ({
             productId: item.product?._id || item._id,
             quantity: Number(item.quantity),
@@ -92,6 +83,9 @@ const PaymentStep = ({ onBack, onSuccess }) => {
             orderItems,
             shippingAddress,
             paymentMethod: paymentMethod === "cod" ? "cod" : "razorpay",
+            discountAmount,
+            totalAmount: finalTotal,
+            couponCode: appliedCoupon?.couponCode || null,
         };
 
         try {
@@ -115,7 +109,7 @@ const PaymentStep = ({ onBack, onSuccess }) => {
             }
 
             const razorpayData = await postJSON("/create-order", {
-                amount: cartSubtotal,
+                amount: finalTotal,
             });
 
             console.log("Razorpay API Response:", razorpayData);
@@ -145,7 +139,6 @@ const PaymentStep = ({ onBack, onSuccess }) => {
                         if (!verifyData.success) {
                             throw new Error(verifyData.message || "Payment verification failed.");
                         }
-
                         const orderData = await postJSON("/createorder", {
                             ...payload,
                             paymentMethod: "razorpay",
@@ -232,6 +225,31 @@ const PaymentStep = ({ onBack, onSuccess }) => {
                 </button>
             </div>
 
+            {/* Order Summary Card */}
+            <div className="bg-white rounded-xl border border-[#E6E6E6] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-3">
+                <h3 className="text-base font-semibold text-[#1A1A1A] pb-2 border-b border-[#E6E6E6]">
+                    Order Summary
+                </h3>
+                <div className="flex items-center justify-between text-sm text-[#4D4D4D]">
+                    <span>Subtotal ({cart?.length || 0} item{cart?.length === 1 ? "" : "s"}):</span>
+                    <span className="font-semibold text-[#1A1A1A]">₹{Number(cartSubtotal || 0).toFixed(2)}</span>
+                </div>
+                {appliedCoupon && (
+                    <div className="flex items-center justify-between text-sm text-[#00B207]">
+                        <span>Coupon Discount ({appliedCoupon.couponCode}):</span>
+                        <span className="font-semibold">-₹{Number(discountAmount || 0).toFixed(2)}</span>
+                    </div>
+                )}
+                <div className="flex items-center justify-between text-sm text-[#4D4D4D]">
+                    <span>Shipping:</span>
+                    <span className="font-semibold text-[#1A1A1A]">Free</span>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-[#E6E6E6] text-base font-bold text-[#1A1A1A]">
+                    <span>Total Payable Amount:</span>
+                    <span className="text-lg text-[#00B207]">₹{Number(finalTotal || 0).toFixed(2)}</span>
+                </div>
+            </div>
+
             <div className="bg-white rounded-xl border border-[#E6E6E6] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
                 <h2 className="text-xl font-semibold text-[#1A1A1A] flex items-center gap-2">
                     <FiCreditCard className="text-[#00B207]" />
@@ -312,7 +330,7 @@ const PaymentStep = ({ onBack, onSuccess }) => {
                                 <FiLock size={16} />
                                 <span>
                                     {paymentMethod === "cod" ? "Place Order" : "Pay Now"} (₹
-                                    {Number(cartSubtotal || 0).toFixed(2)})
+                                    {Number(finalTotal || 0).toFixed(2)})
                                 </span>
                             </>
                         )}

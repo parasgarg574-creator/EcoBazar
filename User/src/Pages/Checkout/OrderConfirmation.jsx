@@ -92,12 +92,12 @@ const OrderConfirmation = ({ order }) => {
                                             {product.name || "Product"}
                                         </p>
                                         <p className="text-xs text-[#666666]">
-                                            Qty: {item.quantity} × ${Number(item.price || 0).toFixed(2)}
+                                            Qty: {item.quantity} × ₹{Number(item.price || 0).toFixed(2)}
                                         </p>
                                     </div>
                                 </div>
                                 <span className="text-sm font-bold text-[#1A1A1A]">
-                                    ${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
+                                    ₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
                                 </span>
                             </div>
                         );
@@ -140,7 +140,7 @@ const OrderConfirmation = ({ order }) => {
                         </div>
                         <div className="flex justify-between text-base font-bold text-[#1A1A1A] pt-2 border-t border-gray-200">
                             <span>Total Paid:</span>
-                            <span className="text-[#00B207]">${Number(totalAmount || 0).toFixed(2)}</span>
+                            <span className="text-[#00B207]">₹{Number(totalAmount || 0).toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
